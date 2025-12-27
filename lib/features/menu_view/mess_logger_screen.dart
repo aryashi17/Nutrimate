@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import '../plate_mapper/plate_mapper_screen.dart';
+import '../profile/profile_screen.dart';
+import '../scanner/add_food_screen.dart';
+import '../sick_bay/sick_bay_screen.dart';
+import '../hydration/hydration_screen.dart';
+
 
 class MessLoggerScreen extends StatefulWidget {
   const MessLoggerScreen({super.key});
@@ -36,32 +41,101 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              _buildHeader(),
-              const SizedBox(height: 30),
-              const Text(
-                "TODAY'S PLATE",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2),
-              ),
-              const SizedBox(height: 15),
-              Expanded(child: _buildBentoGrid()),
-            ],
+  backgroundColor: const Color(0xFF121212),
+
+  appBar: AppBar(
+  backgroundColor: Colors.transparent,
+  elevation: 0,
+
+  // 👤 PROFILE (LEFT)
+  leading: IconButton(
+    icon: const Icon(Icons.person_outline, color: Colors.white),
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ProfileScreen()),
+      );
+    },
+  ),
+
+  // ➕ 🏥 💧 (RIGHT)
+  actions: [
+    // ➕ ADD / SCAN (PRIMARY)
+    Padding(
+      padding: const EdgeInsets.only(right: 4),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddFoodScreen()),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFAAF0D1),
+            borderRadius: BorderRadius.circular(12),
           ),
+          child: const Icon(Icons.add, color: Colors.black, size: 22),
         ),
       ),
-      floatingActionButton: _buildEditButton(),
-    );
+    ),
+
+    // 🏥 SICK BAY
+    IconButton(
+      icon: const Icon(
+        Icons.local_hospital_outlined,
+        color: Colors.white,
+      ),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SickBayScreen()),
+        );
+      },
+    ),
+
+    // 💧 HYDRATION
+    IconButton(
+      icon: const Icon(Icons.water_drop_outlined, color: Colors.white),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const HydrationScreen()),
+        );
+      },
+    ),
+  ],
+),
+
+  body: SafeArea(
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 10), // reduced because AppBar exists
+          _buildHeader(),
+          const SizedBox(height: 30),
+          const Text(
+            "TODAY'S PLATE",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
+            ),
+          ),
+          const SizedBox(height: 15),
+          Expanded(child: _buildBentoGrid()),
+        ],
+      ),
+    ),
+  ),
+
+  floatingActionButton: _buildEditButton(),
+);
   }
 
   Widget _buildHeader() {
