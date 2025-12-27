@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "884200536012",
+    "project_id": "nutimate-app",
+    "storage_bucket": "nutimate-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:884200536012:android:9c012994c9d129527d0f69",
+        "android_client_info": {
+          "package_name": "com.example.nutrimate_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCExKgenamZiMmD29TW6lGz_IuXwS8_WKc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
