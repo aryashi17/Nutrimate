@@ -63,9 +63,10 @@ Container(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: const [
-            Text("9 AM - GO!", style: TextStyle(fontSize: 10, color: Colors.white24)),
-            Text("1 PM - DRINK MORE", style: TextStyle(fontSize: 10, color: Colors.white24)),
-            Text("5 PM - ALMOST THERE", style: TextStyle(fontSize: 10, color: Colors.white24)),
+           Text(" Basically a Fish", style: TextStyle(color: Colors.white24, fontSize: 10)),
+          Text(" Glowing Skin Mode", style: TextStyle(color: Colors.white24, fontSize: 10)),
+          Text(" Low Battery", style: TextStyle(color: Colors.white24, fontSize: 10)),
+          Text(" Desert Survivor", style: TextStyle(color: Colors.white24, fontSize: 10)),
           ],
         ),
       ),
