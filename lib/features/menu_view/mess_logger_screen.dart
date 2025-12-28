@@ -387,7 +387,7 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.person_outline, color: Colors.white),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen())),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) =>  ProfileScreen())),
         ),
         title: Row(
           children: [

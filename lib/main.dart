@@ -8,6 +8,7 @@ import 'core/theme/app_theme.dart';
 import 'core/services/calculator_engine.dart';
 import 'features/auth/login_screen.dart';
 import 'features/menu_view/mess_logger_screen.dart';
+import 'features/profile/profile_screen.dart'; // <--- NEW IMPORT
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,11 +51,9 @@ class AuthWrapper extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
-
         if (snapshot.hasData) {
           return const NeonWelcomeScreen();
         }
-
         return LoginScreen();
       },
     );
@@ -88,7 +87,6 @@ class NeonWelcomeScreen extends StatelessWidget {
                   shadows: [
                     Shadow(blurRadius: 10.0, color: AppTheme.neonPurple, offset: Offset.zero),
                     Shadow(blurRadius: 20.0, color: AppTheme.neonPurple.withOpacity(0.7), offset: Offset.zero),
-                    Shadow(blurRadius: 60.0, color: Colors.purple.withOpacity(0.5), offset: Offset.zero),
                   ],
                 ),
               ),
@@ -97,7 +95,9 @@ class NeonWelcomeScreen extends StatelessWidget {
                 "Logged in as: ${user?.email ?? 'Student'}",
                 style: const TextStyle(color: Colors.white54, fontSize: 14),
               ),
-              const SizedBox(height: 60),
+              const SizedBox(height: 50),
+
+              // --- BUTTON 1: MESS HALL ---
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -120,7 +120,36 @@ class NeonWelcomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              
               const SizedBox(height: 20),
+
+              // --- BUTTON 2: SETUP PROFILE (NEW) ---
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFAAF0D1), // Mint Green
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shadowColor: const Color(0xFFAAF0D1),
+                    elevation: 12,
+                  ),
+                  child: const Text(
+                    "SETUP BODY PROFILE",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // --- BUTTON 3: LOGOUT ---
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
