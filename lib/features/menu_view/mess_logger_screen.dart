@@ -320,6 +320,11 @@ import '../profile/profile_screen.dart';
 import '../scanner/add_food_screen.dart';
 import '../sick_bay/sick_bay_screen.dart';
 import '../hydration/hydration_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; 
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../core/models/user_profile.dart';
+import '../profile/health_status_Section.dart'; 
+import '../../core/models/user_profile.dart';
 
 // Enhanced Mess Logger Screen
 // - Improved visual design and palette
@@ -342,7 +347,13 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   final Color mint = const Color(0xFF7EE081);
   final Color amber = const Color(0xFFF4C430);
   final Color waterBlue = const Color(0xFF4FC3F7);
-
+  // Paste this inside _MessLoggerScreenState, before build()
+Stream<UserProfile?> get userStream {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return const Stream.empty();
+  return FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots()
+      .map((doc) => (doc.exists && doc.data() != null) ? UserProfile.fromMap(doc.data()!) : null);
+}
   // Today menu now stores a `portion` (0.0 - 1.0) to visualise fullness
   final List<Map<String, dynamic>> todayMenu = [
     {'name': 'Basmati Rice', 'icon': Icons.rice_bowl_rounded, 'portion': 0.5},
@@ -481,60 +492,75 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeroCard(),
-              const SizedBox(height: 18),
-              const Text(
-                "TODAY'S PLATE",
-                style: TextStyle(color: Colors.white70, fontSize: 13, letterSpacing: 1.6),
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: GridView.builder(
-                  padding: EdgeInsets.zero,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxis,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 14,
-                    childAspectRatio: 1.05,
-                  ),
-                  itemCount: todayMenu.length,
-                  itemBuilder: (context, index) {
-                    final item = todayMenu[index];
-                    return FoodTile(
-                      name: item['name'] as String,
-                      icon: item['icon'] as IconData,
-                      portion: item['portion'] as double,
-                      mint: mint,
-                      cardDark: cardDark,
-                      onTap: () async {
-                        // open PlateMapper and pass foodName, await a result (if PlateMapper returns one)
-                        final result = await Navigator.push<Map<String, dynamic>>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => PlateMapperScreen(foodName: item['name'] as String),
-                          ),
-                        );
+      body: StreamBuilder<UserProfile?>(
+        stream: userStream, // Listens to the helper we added in step 2
+        builder: (context, snapshot) {
+          final userProfile = snapshot.data;
 
-                        // If PlateMapper returns portion info (e.g. {"fill": 0.6}), use it
-                        if (result != null && result.containsKey('fill')) {
-                          setState(() {
-                            todayMenu[index]['portion'] = (result['fill'] as double).clamp(0.0, 1.0);
-                          });
-                        }
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- 1. NEW STATUS SECTION (BMI, Calories, Protein) ---
+                  HealthStatusSection(user: userProfile),
+                  const SizedBox(height: 18),
+
+                  // --- 2. EXISTING HERO CARD (Meal Completion) ---
+                  // Kept this so you don't lose the "Meal Progress" feature
+                  _buildHeroCard(),
+                  const SizedBox(height: 18),
+
+                  // --- 3. EXISTING GRID HEADER ---
+                  const Text(
+                    "TODAY'S PLATE",
+                    style: TextStyle(color: Colors.white70, fontSize: 13, letterSpacing: 1.6),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // --- 4. EXISTING FOOD GRID ---
+                  Expanded(
+                    child: GridView.builder(
+                      padding: EdgeInsets.zero,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxis, // Uses the variable from your build method
+                        crossAxisSpacing: 14,
+                        mainAxisSpacing: 14,
+                        childAspectRatio: 1.05,
+                      ),
+                      itemCount: todayMenu.length,
+                      itemBuilder: (context, index) {
+                        final item = todayMenu[index];
+                        return FoodTile(
+                          name: item['name'] as String,
+                          icon: item['icon'] as IconData,
+                          portion: item['portion'] as double,
+                          mint: mint,
+                          cardDark: cardDark,
+                          onTap: () async {
+                            final result = await Navigator.push<Map<String, dynamic>>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PlateMapperScreen(foodName: item['name'] as String),
+                              ),
+                            );
+
+                            if (result != null && result.containsKey('fill')) {
+                              setState(() {
+                                todayMenu[index]['portion'] = (result['fill'] as double).clamp(0.0, 1.0);
+                              });
+                            }
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: mint,

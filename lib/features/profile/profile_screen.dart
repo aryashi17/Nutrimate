@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:nutrimate_app/features/profile/user_profile.dart';
 import '../../core/services/health_calculator.dart';
 import '../../core/models/user_profile.dart';
-import '../auth/login_screen.dart'; // Import your login screen
+import '../auth/login_screen.dart';
 import 'activity_chat_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -16,81 +15,120 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  String gender = 'Male';
+  
   final TextEditingController _ageCtrl = TextEditingController();
   final TextEditingController _heightCtrl = TextEditingController();
   final TextEditingController _weightCtrl = TextEditingController();
-  String activityLevel = 'Moderate';
-  bool _isLoading = false; // Add loading state
 
-  // --- LOGOUT FUNCTION ---
-  void _logout() async {
-    await FirebaseAuth.instance.signOut();
-    if (mounted) {
-      // Navigate back to Login Screen and remove all previous routes
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) =>  LoginScreen()),
-        (route) => false,
-      );
+  bool _isEditing = true;
+  bool _isLoading = true;
+  UserProfile? _currentProfile;
+
+  String _gender = 'Male';
+  String _activityLevel = 'Moderate';
+  String _goal = 'Maintain'; // NEW State Variable
+
+  final List<String> _goals = ['Weight Loss', 'Maintain', 'Muscle Gain'];
+  final List<String> _activities = ['Sedentary', 'Lightly Active', 'Moderate', 'Very Active', 'Super Active'];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        if (doc.exists && doc.data() != null) {
+          final profile = UserProfile.fromMap(doc.data()!);
+          if (mounted) {
+            setState(() {
+              _currentProfile = profile;
+              _ageCtrl.text = profile.age.toString();
+              _heightCtrl.text = profile.heightCm.toString();
+              _weightCtrl.text = profile.weightKg.toString();
+              _gender = profile.gender;
+              _activityLevel = profile.activityLevel;
+              _goal = profile.goal; // Load Goal
+              _isEditing = false;
+              _isLoading = false;
+            });
+          }
+        } else {
+          setState(() => _isLoading = false);
+        }
+      } catch (e) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   void _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true); // Start loading
+    setState(() => _isLoading = true);
 
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No user logged in!"))
-      );
-      setState(() => _isLoading = false);
-      return;
-    }
+    if (user == null) return;
 
     try {
       int age = int.parse(_ageCtrl.text);
       double height = double.parse(_heightCtrl.text);
       double weight = double.parse(_weightCtrl.text);
 
-      int bmr = HealthCalculator.calculateBMR(gender, age, height, weight);
-      int tdee = HealthCalculator.calculateTDEE(bmr, activityLevel);
+      // 1. Calculate Base Stats
+      double bmi = HealthCalculator.calculateBMI(height, weight);
+      int bmr = HealthCalculator.calculateBMR(_gender, age, height, weight);
+      int tdee = HealthCalculator.calculateTDEE(bmr, _activityLevel);
+      
+      // 2. Adjust for Goal
+      int targetCalories = HealthCalculator.adjustCaloriesForGoal(tdee, _goal);
+      
+      // 3. Calculate Macros
+      Map<String, int> macros = HealthCalculator.calculateMacros(targetCalories, _goal);
+      
       int water = HealthCalculator.calculateWater(weight);
 
       UserProfile profile = UserProfile(
         uid: user.uid,
-        gender: gender,
+        gender: _gender,
         age: age,
         heightCm: height,
         weightKg: weight,
-        activityLevel: activityLevel,
-        dailyCalorieTarget: tdee,
-        dailyProteinTarget: (weight * 1.8).toInt(),
+        activityLevel: _activityLevel,
+        goal: _goal, // Save Goal
+        bmi: bmi,
+        dailyCalorieTarget: targetCalories,
+        dailyProteinTarget: macros['protein']!,
+        dailyCarbTarget: macros['carbs']!,
+        dailyFatTarget: macros['fats']!,
         dailyWaterTarget: water,
       );
 
-      // Save to Firebase
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .set(profile.toMap(), SetOptions(merge: true));
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set(profile.toMap());
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Plan Generated Successfully!"))
-        );
-        Navigator.pop(context); // Go back to previous screen
+        setState(() {
+          _currentProfile = profile;
+          _isEditing = false;
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile Updated!")));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e"))
-        );
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
       }
-    } finally {
-      if (mounted) setState(() => _isLoading = false); // Stop loading
+    }
+  }
+
+  void _logout() async {
+    await FirebaseAuth.instance.signOut();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => LoginScreen()), (r) => false);
     }
   }
 
@@ -99,95 +137,150 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        title: const Text("Your Body Profile", style: TextStyle(color: Colors.white)),
+        title: Text(_isEditing ? "Edit Profile" : "My Plan", style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          // --- LOGOUT BUTTON ---
-          IconButton(
-            onPressed: _logout,
-            icon: const Icon(Icons.logout, color: Colors.redAccent),
-            tooltip: "Logout",
-          ),
+          if (!_isLoading && _currentProfile != null)
+            IconButton(
+              icon: Icon(_isEditing ? Icons.close : Icons.edit, color: Colors.white),
+              onPressed: () => setState(() => _isEditing = !_isEditing),
+            ),
+          IconButton(onPressed: _logout, icon: const Icon(Icons.logout, color: Colors.redAccent)),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
+      body: _isLoading 
+        ? const Center(child: CircularProgressIndicator(color: Color(0xFFAAF0D1)))
+        : SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: _isEditing ? _buildEditForm() : _buildDisplayView(),
+          ),
+    );
+  }
+
+  // --- VIEW MODE ---
+  Widget _buildDisplayView() {
+    final p = _currentProfile!;
+    final mint = const Color(0xFFAAF0D1);
+    
+    return Column(
+      children: [
+        // Hero Card
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [mint.withOpacity(0.2), const Color(0xFF1E1E1E)]),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: mint.withOpacity(0.3)),
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Let's calibrate your nutrition plan.", style: TextStyle(color: Colors.white54)),
-              const SizedBox(height: 30),
-
-              Row(
-                children: [
-                  _genderButton("Male"),
-                  const SizedBox(width: 20),
-                  _genderButton("Female"),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              _buildInput("Age", _ageCtrl, "Years"),
-              _buildInput("Height", _heightCtrl, "cm"),
-              _buildInput("Weight", _weightCtrl, "kg"),
-
-              const SizedBox(height: 30),
-              const Text("ACTIVITY LEVEL", style: TextStyle(color: Color(0xFFAAF0D1), fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              
-              // Activity Level Selector
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: const Color(0xFFAAF0D1)),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(activityLevel, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                        TextButton.icon(
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ActivityChatScreen(
-                              onLevelSelected: (level) => setState(() => activityLevel = level),
-                            )));
-                          },
-                          icon: const Icon(Icons.chat_bubble_outline, color: Color(0xFFAAF0D1)),
-                          label: const Text("Talk to AI Trainer", style: TextStyle(color: Color(0xFFAAF0D1))),
-                        ),
-                      ],
-                    ),
-                    const Text("Not sure? Tap 'Talk to AI Trainer' and describe your day!", style: TextStyle(color: Colors.white38, fontSize: 12)),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 50),
-              
-              // --- GENERATE BUTTON ---
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _saveProfile, // Disable if loading
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFAAF0D1), 
-                    foregroundColor: Colors.black
-                  ),
-                  child: _isLoading 
-                    ? const CircularProgressIndicator(color: Colors.black) 
-                    : const Text("GENERATE MY PLAN", style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ),
+              Text("DAILY GOAL (${p.goal.toUpperCase()})", style: const TextStyle(color: Colors.white54, fontSize: 12, letterSpacing: 2)),
+              const SizedBox(height: 8),
+              Text("${p.dailyCalorieTarget}", style: TextStyle(color: mint, fontSize: 48, fontWeight: FontWeight.bold)),
+              const Text("Calories / Day", style: TextStyle(color: Colors.white54, fontSize: 12)),
             ],
           ),
         ),
+        const SizedBox(height: 24),
+        
+        // Macros Grid
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 1.5,
+          children: [
+            _buildStatCard("PROTEIN", "${p.dailyProteinTarget}g", Icons.fitness_center, Colors.blueAccent),
+            _buildStatCard("CARBS", "${p.dailyCarbTarget}g", Icons.rice_bowl, Colors.orange),
+            _buildStatCard("FATS", "${p.dailyFatTarget}g", Icons.opacity, Colors.yellow),
+            _buildStatCard("WATER", "${(p.dailyWaterTarget/1000).toStringAsFixed(1)}L", Icons.water_drop, Colors.cyan),
+          ],
+        ),
+        
+        const SizedBox(height: 24),
+        // Details List
+        _buildDetailRow("BMI", "${p.bmi}", Icons.monitor_weight),
+        _buildDetailRow("Activity", p.activityLevel, Icons.directions_run),
+      ],
+    );
+  }
+
+  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E1E),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Icon(icon, color: color, size: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+              Text(label, style: const TextStyle(color: Colors.white38, fontSize: 10)),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white54, size: 18),
+          const SizedBox(width: 12),
+          Text(label, style: const TextStyle(color: Colors.white54)),
+          const Spacer(),
+          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  // --- EDIT MODE ---
+  Widget _buildEditForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Let's build your plan.", style: TextStyle(color: Colors.white54)),
+          const SizedBox(height: 20),
+          
+          Row(children: [_genderButton("Male"), const SizedBox(width: 20), _genderButton("Female")]),
+          const SizedBox(height: 20),
+          
+          _buildInput("Age", _ageCtrl, "Years"),
+          _buildInput("Height", _heightCtrl, "cm"),
+          _buildInput("Weight", _weightCtrl, "kg"),
+          
+          const SizedBox(height: 20),
+          _buildDropdown("Activity Level", _activityLevel, _activities, (val) => setState(() => _activityLevel = val!)),
+          const SizedBox(height: 20),
+          _buildDropdown("Your Goal", _goal, _goals, (val) => setState(() => _goal = val!)),
+          
+          const SizedBox(height: 40),
+          SizedBox(
+            width: double.infinity,
+            height: 55,
+            child: ElevatedButton(
+              onPressed: _saveProfile,
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFAAF0D1), foregroundColor: Colors.black),
+              child: const Text("GENERATE PLAN", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -197,9 +290,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.only(bottom: 15),
       child: TextFormField(
         controller: ctrl,
-        keyboardType: TextInputType.number,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
         style: const TextStyle(color: Colors.white),
-        validator: (val) => (val == null || val.isEmpty) ? "Required" : null, // Added validation logic
+        validator: (v) => v!.isEmpty ? "Required" : null,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(color: Colors.white54),
@@ -211,23 +304,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildDropdown(String label, String value, List<String> items, ValueChanged<String?> onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: Color(0xFFAAF0D1), fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: Colors.white12),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              dropdownColor: const Color(0xFF1E1E1E),
+              style: const TextStyle(color: Colors.white),
+              items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _genderButton(String val) {
-    bool isSelected = gender == val;
+    bool isSelected = _gender == val;
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => gender = val),
+        onTap: () => setState(() => _gender = val),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 15),
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xFFAAF0D1) : const Color(0xFF1E1E1E),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Center(
-            child: Text(
-              val,
-              style: TextStyle(color: isSelected ? Colors.black : Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
+          child: Center(child: Text(val, style: TextStyle(color: isSelected ? Colors.black : Colors.white, fontWeight: FontWeight.bold))),
         ),
       ),
     );

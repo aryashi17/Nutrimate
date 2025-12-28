@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/models/food_item.dart';
-import '../../core/services/add_food_service_mock.dart';
+import '../../core/services/add_food_service.dart';
 
 class AddFoodScreen extends StatefulWidget {
   const AddFoodScreen({super.key});
@@ -10,7 +10,7 @@ class AddFoodScreen extends StatefulWidget {
 }
 
 class _AddFoodScreenState extends State<AddFoodScreen> {
-  final AddFoodServiceMock _service = AddFoodServiceMock();
+  final AddFoodService _service = AddFoodService();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _calController = TextEditingController();
