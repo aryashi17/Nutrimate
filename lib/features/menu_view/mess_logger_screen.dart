@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 // --- SERVICE & CORE IMPORTS ---
@@ -11,14 +11,14 @@ import '../../core/models/user_profile.dart';
 import '../../core/models/meal_log_entry.dart';
 import '../../core/services/mess_menu_service.dart';
 
-
 // --- FEATURE IMPORTS ---
 import 'package:nutrimate_app/features/hydration/health_insights_screen.dart';
 import '../plate_mapper/plate_mapper_screen.dart';
 import '../profile/profile_screen.dart';
 import '../sick_bay/sick_bay_screen.dart';
 import '../hydration/hydration_screen.dart';
-import '../profile/health_status_Section.dart'; 
+import '../profile/health_status_Section.dart';
+import '../menu/weekly_menu_screen.dart';
 
 class MessLoggerScreen extends StatefulWidget {
   const MessLoggerScreen({super.key});
@@ -33,52 +33,48 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   final Color accentMint = const Color(0xFFB2FF59);
   final Color glassLayer = const Color(0xFF1A1A1A);
   final Color mutedText = const Color(0xFF8E8E93);
-  final Color cardDark = const Color(0xFF17201B); 
+  final Color cardDark = const Color(0xFF17201B);
 
   // --- STATE VARIABLES ---
   String selectedMeal = "Lunch";
   String? _hoveredMeal;
-  Map<String, String> globalPlateOccupancy = {}; 
+  Map<String, String> globalPlateOccupancy = {};
   Map<String, double> globalPlateFills = {};
   final TextEditingController _foodNameController = TextEditingController();
 
   // Categorized Meal Data (Merged Data Structure)
   Map<String, List<Map<String, dynamic>>> mealData = {};
-bool isMenuLoading = true;
+  bool isMenuLoading = true;
 
-
-@override
-void initState() {
-  super.initState();
-  _determineInitialMeal();
-  _loadTodayMenu(); // ✅ THIS WAS MISSING
-}
-
-
-Future<void> _loadTodayMenu() async {
-  try {
-    final service = MessMenuService();
-    final menu = await service.getTodayMenu();
-
-    // Normalize Firestore data → UI format
-    menu.forEach((meal, items) {
-      for (final item in items) {
-        item['portion'] = item['defaultPortion'] ?? 0.5;
-        item['icon'] = Icons.restaurant_menu_rounded;
-      }
-    });
-
-    setState(() {
-      mealData = menu;
-      isMenuLoading = false;
-    });
-  } catch (e) {
-    print("❌ Error loading menu: $e");
-    setState(() => isMenuLoading = false);
+  @override
+  void initState() {
+    super.initState();
+    _determineInitialMeal();
+    _loadTodayMenu(); // ✅ THIS WAS MISSING
   }
-}
 
+  Future<void> _loadTodayMenu() async {
+    try {
+      final service = MessMenuService();
+      final menu = await service.getTodayMenu();
 
+      // Normalize Firestore data → UI format
+      menu.forEach((meal, items) {
+        for (final item in items) {
+          item['portion'] = item['defaultPortion'] ?? 0.5;
+          item['icon'] = Icons.restaurant_menu_rounded;
+        }
+      });
+
+      setState(() {
+        mealData = menu;
+        isMenuLoading = false;
+      });
+    } catch (e) {
+      print("❌ Error loading menu: $e");
+      setState(() => isMenuLoading = false);
+    }
+  }
 
   // --- LOGIC: Auto-detect meal time (From HEAD concept) ---
   void _determineInitialMeal() {
@@ -98,8 +94,15 @@ Future<void> _loadTodayMenu() async {
   Stream<UserProfile?> get userStream {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return const Stream.empty();
-    return FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots()
-        .map((doc) => (doc.exists && doc.data() != null) ? UserProfile.fromMap(doc.data()!) : null);
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .snapshots()
+        .map(
+          (doc) => (doc.exists && doc.data() != null)
+              ? UserProfile.fromMap(doc.data()!)
+              : null,
+        );
   }
 
   // --- LOGIC: Save to Firebase (Restored from HEAD & Adapted) ---
@@ -124,8 +127,8 @@ Future<void> _loadTodayMenu() async {
     }
 
     final logEntry = MealLogEntry(
-      id: '', 
-      name: "Mess Hall - $selectedMeal", 
+      id: '',
+      name: "Mess Hall - $selectedMeal",
       calories: totalCalories,
       protein: totalProtein,
       carbs: totalCarbs,
@@ -142,7 +145,10 @@ Future<void> _loadTodayMenu() async {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("$selectedMeal logged to Dashboard!"), backgroundColor: accentMint),
+          SnackBar(
+            content: Text("$selectedMeal logged to Dashboard!"),
+            backgroundColor: accentMint,
+          ),
         );
       }
     } catch (e) {
@@ -154,7 +160,10 @@ Future<void> _loadTodayMenu() async {
   double get currentMealCompletion {
     final items = mealData[selectedMeal] ?? [];
     if (items.isEmpty) return 0.0;
-    double totalPortion = items.fold(0.0, (sum, item) => sum + (item['portion'] as double));
+    double totalPortion = items.fold(
+      0.0,
+      (sum, item) => sum + (item['portion'] as double),
+    );
     return (totalPortion / items.length).clamp(0.0, 1.0);
   }
 
@@ -166,37 +175,45 @@ Future<void> _loadTodayMenu() async {
         children: [
           // Background Gradient Glow
           Positioned(
-            top: -100, right: -50,
+            top: -100,
+            right: -50,
             child: Container(
-              width: 300, height: 300,
+              width: 300,
+              height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: accentMint.withOpacity(0.08),
                 border: Border.all(color: Colors.transparent),
               ),
-              child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80), child: Container()),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+                child: Container(),
+              ),
             ),
           ),
-          
+
           StreamBuilder<UserProfile?>(
             stream: userStream,
             builder: (context, snapshot) {
               final userProfile = snapshot.data;
-              
+
               return SafeArea(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeader(),
                     _buildDynamicHorizontalActions(),
-                    
+
                     // 1. MERGED: Health Status (Was in HEAD, missed in new UI)
                     if (userProfile != null)
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 10,
+                        ),
                         child: HealthStatusSection(user: userProfile),
                       ),
-                    
+
                     // 2. MERGED: Hero Card (Restyled for new theme)
                     _buildHeroCard(),
 
@@ -207,7 +224,7 @@ Future<void> _loadTodayMenu() async {
                   ],
                 ),
               );
-            }
+            },
           ),
         ],
       ),
@@ -224,8 +241,9 @@ Future<void> _loadTodayMenu() async {
       decoration: BoxDecoration(
         color: glassLayer,
         gradient: LinearGradient(
-          colors: [glassLayer, glassLayer.withOpacity(0.8)], 
-          begin: Alignment.topLeft, end: Alignment.bottomRight
+          colors: [glassLayer, glassLayer.withOpacity(0.8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
@@ -236,11 +254,29 @@ Future<void> _loadTodayMenu() async {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("MEAL PROGRESS", style: TextStyle(color: accentMint, fontSize: 12, letterSpacing: 1.5, fontWeight: FontWeight.bold)),
+                Text(
+                  "MEAL PROGRESS",
+                  style: TextStyle(
+                    color: accentMint,
+                    fontSize: 12,
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                const Text("Plate Completion", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
+                const Text(
+                  "Plate Completion",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text("Based on your portion mapping", style: TextStyle(color: mutedText, fontSize: 12)),
+                Text(
+                  "Based on your portion mapping",
+                  style: TextStyle(color: mutedText, fontSize: 12),
+                ),
               ],
             ),
           ),
@@ -248,7 +284,8 @@ Future<void> _loadTodayMenu() async {
             alignment: Alignment.center,
             children: [
               SizedBox(
-                width: 60, height: 60,
+                width: 60,
+                height: 60,
                 child: CircularProgressIndicator(
                   value: percent,
                   strokeWidth: 6,
@@ -256,9 +293,16 @@ Future<void> _loadTodayMenu() async {
                   valueColor: AlwaysStoppedAnimation(accentMint),
                 ),
               ),
-              Text("${(percent * 100).toInt()}%", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+              Text(
+                "${(percent * 100).toInt()}%",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -274,18 +318,47 @@ Future<void> _loadTodayMenu() async {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("LOG YOUR", style: TextStyle(color: mutedText, fontSize: 10, letterSpacing: 4)),
-              const Text("NUTRITION", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w200, letterSpacing: 2)),
+              Text(
+                "LOG YOUR",
+                style: TextStyle(
+                  color: mutedText,
+                  fontSize: 10,
+                  letterSpacing: 4,
+                ),
+              ),
+              const Text(
+                "NUTRITION",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w200,
+                  letterSpacing: 2,
+                ),
+              ),
             ],
           ),
           GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen())),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
             child: Container(
               padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: accentMint, width: 1)),
-              child: const CircleAvatar(radius: 20, backgroundColor: Colors.black, child: Icon(Icons.person_2_outlined, color: Colors.white, size: 20)),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: accentMint, width: 1),
+              ),
+              child: const CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.black,
+                child: Icon(
+                  Icons.person_2_outlined,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -300,16 +373,56 @@ Future<void> _loadTodayMenu() async {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
-          _buildPillAction(Icons.local_hospital_outlined, "Sick Bay", const Color(0xFFFF4B4B), () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SickBayScreen()))),
-          _buildPillAction(Icons.water_drop_outlined, "Hydrate", const Color(0xFF00B0FF), () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HydrationScreen()))),
-          _buildPillAction(Icons.save_alt_rounded, "Log Cloud", accentMint, () => _logPlateToFirebase()), // Logs to Firebase
-          _buildPillAction(Icons.add_circle_outline, "Add", Colors.white, () => _showEditSheet()),
+          _buildPillAction(
+            Icons.local_hospital_outlined,
+            "Sick Bay",
+            const Color(0xFFFF4B4B),
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SickBayScreen()),
+            ),
+          ),
+          _buildPillAction(
+            Icons.water_drop_outlined,
+            "Hydrate",
+            const Color(0xFF00B0FF),
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const HydrationScreen()),
+            ),
+          ),
+          _buildPillAction(
+            Icons.save_alt_rounded,
+            "Log Cloud",
+            accentMint,
+            () => _logPlateToFirebase(),
+          ), // Logs to Firebase
+          _buildPillAction(
+            Icons.add_circle_outline,
+            "Add",
+            Colors.white,
+            () => _showEditSheet(),
+          ),
+          _buildPillAction(
+            Icons.calendar_month_outlined,
+            "Menu",
+            Colors.orangeAccent,
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const WeeklyMenuScreen()),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildPillAction(IconData icon, String label, Color color, VoidCallback tap) {
+  Widget _buildPillAction(
+    IconData icon,
+    String label,
+    Color color,
+    VoidCallback tap,
+  ) {
     return GestureDetector(
       onTap: tap,
       child: Container(
@@ -324,7 +437,14 @@ Future<void> _loadTodayMenu() async {
           children: [
             Icon(icon, color: color, size: 20),
             const SizedBox(width: 8),
-            Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w300)),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
           ],
         ),
       ),
@@ -355,20 +475,30 @@ Future<void> _loadTodayMenu() async {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: selected ? accentMint.withOpacity(0.1) : (hovered ? glassLayer.withOpacity(0.5) : Colors.transparent),
+            color: selected
+                ? accentMint.withOpacity(0.1)
+                : (hovered ? glassLayer.withOpacity(0.5) : Colors.transparent),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: selected ? accentMint : (hovered ? accentMint.withOpacity(0.5) : Colors.transparent),
+              color: selected
+                  ? accentMint
+                  : (hovered
+                        ? accentMint.withOpacity(0.5)
+                        : Colors.transparent),
               width: 1.5,
             ),
-            boxShadow: hovered ? [BoxShadow(color: accentMint.withOpacity(0.2), blurRadius: 8)] : null,
+            boxShadow: hovered
+                ? [BoxShadow(color: accentMint.withOpacity(0.2), blurRadius: 8)]
+                : null,
           ),
           child: Column(
             children: [
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 200),
                 style: TextStyle(
-                  color: selected ? accentMint : (hovered ? Colors.white : mutedText),
+                  color: selected
+                      ? accentMint
+                      : (hovered ? Colors.white : mutedText),
                   fontSize: selected ? 15 : 13,
                   fontWeight: selected ? FontWeight.bold : FontWeight.normal,
                 ),
@@ -382,37 +512,34 @@ Future<void> _loadTodayMenu() async {
   }
 
   // --- UI: List ---
-Widget _buildSmoothList() {
-  if (isMenuLoading) {
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
-  }
+  Widget _buildSmoothList() {
+    if (isMenuLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-  final items = mealData[selectedMeal] ?? [];
+    final items = mealData[selectedMeal] ?? [];
 
-  if (items.isEmpty) {
-    return const Center(
-      child: Text(
-        "No items available",
-        style: TextStyle(color: Colors.white54),
-      ),
-    );
-  }
-
-  return ListView.builder(
-    padding: const EdgeInsets.symmetric(horizontal: 24),
-    itemCount: items.length,
-    itemBuilder: (context, index) {
-      final item = items[index];
-      return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 500),
-        child: _buildModernFoodRow(item, index),
+    if (items.isEmpty) {
+      return const Center(
+        child: Text(
+          "No items available",
+          style: TextStyle(color: Colors.white54),
+        ),
       );
-    },
-  );
-}
+    }
 
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 500),
+          child: _buildModernFoodRow(item, index),
+        );
+      },
+    );
+  }
 
   Widget _buildModernFoodRow(Map<String, dynamic> item, int index) {
     return Container(
@@ -430,7 +557,10 @@ Widget _buildSmoothList() {
           children: [
             Container(
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(15)),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(15),
+              ),
               child: Icon(item['icon'], color: accentMint, size: 18),
             ),
             const SizedBox(width: 16),
@@ -438,7 +568,14 @@ Widget _buildSmoothList() {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item['name'], style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400)),
+                  Text(
+                    item['name'],
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
@@ -453,7 +590,10 @@ Widget _buildSmoothList() {
               ),
             ),
             const SizedBox(width: 20),
-            Text("${(item['portion'] * 100).toInt()}%", style: TextStyle(color: mutedText, fontSize: 12)),
+            Text(
+              "${(item['portion'] * 100).toInt()}%",
+              style: TextStyle(color: mutedText, fontSize: 12),
+            ),
             const Icon(Icons.chevron_right_rounded, color: Colors.white12),
           ],
         ),
@@ -473,19 +613,38 @@ Widget _buildSmoothList() {
             height: 60,
             decoration: BoxDecoration(
               color: accentMint.withOpacity(0.9),
-              boxShadow: [BoxShadow(color: accentMint.withOpacity(0.3), blurRadius: 20)],
+              boxShadow: [
+                BoxShadow(color: accentMint.withOpacity(0.3), blurRadius: 20),
+              ],
             ),
             child: InkWell(
               onTap: () {
-                 _logPlateToFirebase();
-                 Navigator.push(context, MaterialPageRoute(builder: (_) => const HealthInsightsScreen()));
+                _logPlateToFirebase();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const HealthInsightsScreen(),
+                  ),
+                );
               },
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("ANALYZE DIET GAP", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 13)),
+                  Text(
+                    "ANALYZE DIET GAP",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                      fontSize: 13,
+                    ),
+                  ),
                   SizedBox(width: 10),
-                  Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 18),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.black,
+                    size: 18,
+                  ),
                 ],
               ),
             ),
@@ -499,18 +658,23 @@ Widget _buildSmoothList() {
   void _handleFoodTap(Map<String, dynamic> item) async {
     try {
       final List<Map<String, dynamic>>? changes = await Navigator.push(
-        context, MaterialPageRoute(builder: (_) => PlateMapperScreen(
-          foodName: item['name'], initialFill: item['portion'],
-          existingOccupancy: globalPlateOccupancy, existingFills: globalPlateFills,
-        )),
+        context,
+        MaterialPageRoute(
+          builder: (_) => PlateMapperScreen(
+            foodName: item['name'],
+            initialFill: item['portion'],
+            existingOccupancy: globalPlateOccupancy,
+            existingFills: globalPlateFills,
+          ),
+        ),
       );
-      
+
       if (changes != null && changes.isNotEmpty) {
         setState(() {
           for (final change in changes) {
             globalPlateOccupancy[change['section']] = change['food'];
             globalPlateFills[change['section']] = change['fill'];
-            
+
             final mealItems = mealData[selectedMeal]!;
             final i = mealItems.indexWhere((m) => m['name'] == change['food']);
             if (i != -1) mealItems[i]['portion'] = change['fill'];
@@ -519,7 +683,10 @@ Widget _buildSmoothList() {
 
         // Async updates
         try {
-          await Provider.of<CalculatorEngine>(context, listen: false).addFood(item['name'], item['portion']);
+          await Provider.of<CalculatorEngine>(
+            context,
+            listen: false,
+          ).addFood(item['name'], item['portion']);
           await StreakService().updateStreak();
         } catch (e) {
           print('Error updating calculator or streak: $e');
@@ -531,33 +698,90 @@ Widget _buildSmoothList() {
   }
 
   void _showDeleteDialog(int index) {
-    showDialog(context: context, builder: (context) => AlertDialog(
-      backgroundColor: glassLayer, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: const Text('Delete?', style: TextStyle(color: Colors.white)),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text('NO', style: TextStyle(color: mutedText))),
-        TextButton(onPressed: () { setState(() => mealData[selectedMeal]!.removeAt(index)); Navigator.pop(context); }, child: const Text('YES', style: TextStyle(color: Colors.redAccent))),
-      ],
-    ));
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: glassLayer,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Delete?', style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('NO', style: TextStyle(color: mutedText)),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() => mealData[selectedMeal]!.removeAt(index));
+              Navigator.pop(context);
+            },
+            child: const Text('YES', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showEditSheet() {
     _foodNameController.clear();
-    showModalBottomSheet(context: context, isScrollControlled: true, backgroundColor: glassLayer, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(30))), builder: (context) => Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 24, right: 24, top: 24),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        TextField(controller: _foodNameController, style: const TextStyle(color: Colors.white), decoration: InputDecoration(hintText: "What are you eating?", hintStyle: TextStyle(color: mutedText), border: InputBorder.none)),
-        const SizedBox(height: 20),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: accentMint, minimumSize: const Size(double.infinity, 55), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-          onPressed: () {
-            if (_foodNameController.text.isNotEmpty) {
-              setState(() => mealData[selectedMeal]!.add({'name': _foodNameController.text, 'icon': Icons.restaurant_menu_rounded, 'portion': 0.0}));
-              Navigator.pop(context);
-            }
-          }, child: const Text("ADD TO LIST", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold))),
-        const SizedBox(height: 30),
-      ]),
-    ));
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: glassLayer,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 24,
+          right: 24,
+          top: 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _foodNameController,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "What are you eating?",
+                hintStyle: TextStyle(color: mutedText),
+                border: InputBorder.none,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: accentMint,
+                minimumSize: const Size(double.infinity, 55),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              onPressed: () {
+                if (_foodNameController.text.isNotEmpty) {
+                  setState(
+                    () => mealData[selectedMeal]!.add({
+                      'name': _foodNameController.text,
+                      'icon': Icons.restaurant_menu_rounded,
+                      'portion': 0.0,
+                    }),
+                  );
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text(
+                "ADD TO LIST",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
   }
 }
