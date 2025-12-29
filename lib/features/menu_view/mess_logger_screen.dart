@@ -204,18 +204,22 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
                     _buildHeader(),
                     _buildDynamicHorizontalActions(),
 
-                    // 1. MERGED: Health Status (Was in HEAD, missed in new UI)
+                    // 1. MERGED: Health Status and Hero Card side by side
                     if (userProfile != null)
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 10,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: HealthStatusSection(user: userProfile),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildHeroCard(),
+                            ),
+                          ],
                         ),
-                        child: HealthStatusSection(user: userProfile),
                       ),
-
-                    // 2. MERGED: Hero Card (Restyled for new theme)
-                    _buildHeroCard(),
 
                     const SizedBox(height: 5),
                     _buildElegantMealSelector(),
@@ -235,9 +239,7 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   Widget _buildHeroCard() {
     final percent = currentMealCompletion;
     return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: glassLayer,
         gradient: LinearGradient(
@@ -284,8 +286,8 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
             alignment: Alignment.center,
             children: [
               SizedBox(
-                width: 60,
-                height: 60,
+                width: 50,
+                height: 50,
                 child: CircularProgressIndicator(
                   value: percent,
                   strokeWidth: 6,

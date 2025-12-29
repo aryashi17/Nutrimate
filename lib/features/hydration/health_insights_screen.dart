@@ -35,7 +35,7 @@ class HealthInsightsScreen extends StatelessWidget {
     ),
     Text(
       "Tracking your progress for ${DateTime.now().day} ${_getMonth(DateTime.now().month)}",
-      style: const TextStyle(color: const Color(0xFF7EE081), fontSize: 16),
+      style: const TextStyle(color: Color(0xFF7EE081), fontSize: 16),
     ),
             const SizedBox(height: 20),
             

@@ -14,14 +14,14 @@ class GoalsDashboard extends StatelessWidget {
   final GoalType userGoalType;
 
   const GoalsDashboard({
-    Key? key,
+    super.key,
     required this.userGender,
     required this.userAge,
     required this.userHeight,
     required this.userWeight,
     required this.userActivity,
     this.userGoalType = GoalType.lose,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

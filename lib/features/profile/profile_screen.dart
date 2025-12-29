@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/services/health_calculator.dart';
 import '../../core/models/user_profile.dart';
 import '../auth/login_screen.dart';
-import 'activity_chat_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

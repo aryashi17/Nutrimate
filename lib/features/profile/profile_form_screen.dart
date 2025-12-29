@@ -3,7 +3,7 @@ import '../../core/services/health_calculator.dart';
 import '../../core/enums/app_enums.dart';
 import '../../core/models/user_profile.dart'; // You likely need this too
 class ProfileFormScreen extends StatefulWidget {
-  const ProfileFormScreen({Key? key}) : super(key: key);
+  const ProfileFormScreen({super.key});
 
   @override
   State<ProfileFormScreen> createState() => _ProfileFormScreenState();

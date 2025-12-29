@@ -63,7 +63,7 @@ class StreakService {
         });
       } else if (difference > 1) {
         // Missed a day, reset streak
-        print('StreakService: Resetting streak (missed ${difference} days)');
+        print('StreakService: Resetting streak (missed $difference days)');
         await userDoc.update({
           'streak': 1,
           'lastLogDate': now.toIso8601String(),

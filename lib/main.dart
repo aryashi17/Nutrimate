@@ -13,7 +13,6 @@ import 'core/services/streak_services.dart';
 // --- FEATURE IMPORTS ---
 import 'features/auth/login_screen.dart';
 import 'features/menu_view/mess_logger_screen.dart';
-import 'features/profile/profile_screen.dart';
 import '../features/dashboard/dashboard_screen.dart'; 
 import 'features/reports/summary_screen.dart';
 

@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/models/user_profile.dart';
 import '../../core/models/meal_log_entry.dart'; 
 import '../profile/profile_screen.dart';
-import '../scanner/add_food_screen.dart'; 
 
 // --- IMPORT THE SUMMARY SCREEN HERE ---
 import '../reports/summary_screen.dart'; 
