@@ -21,7 +21,7 @@ class AddFoodServiceMock implements AddFoodService {
         "largest_compartment": 250,
         "small_bowl": 150,
         "circular_bowl": 120,
-      },i
+      },
     );
   }
 
