@@ -1,15 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class meal_log_entry {
+// 1. Rename class to PascalCase to match Dart conventions and your UI call
+class MealLogEntry { 
   final String id;
   final String name;
-  final int calories;
-  final int protein;
-  final int carbs;
-  final int fat;
+  
+  // 2. Change macros to double to fix "double can't be assigned to int" errors
+  final double calories;
+  final double protein;
+  final double carbs;
+  final double fat;
+  
   final DateTime timestamp;
 
-  meal_log_entry({
+  MealLogEntry({
     required this.id,
     required this.name,
     required this.calories,
@@ -20,15 +24,18 @@ class meal_log_entry {
   });
 
   // Factory to convert Firebase Data -> Object
-  factory meal_log_entry.fromMap(Map<String, dynamic> map, String docId) {
-    return meal_log_entry(
+  factory MealLogEntry.fromMap(Map<String, dynamic> map, String docId) {
+    return MealLogEntry(
       id: docId,
       name: map['name'] ?? 'Unknown Meal',
-      // SAFETY: Handle if data is missing or stored as String/Double
-      calories: (map['calories'] as num? ?? 0).toInt(),
-      protein: (map['protein'] as num? ?? 0).toInt(),
-      carbs: (map['carbs'] as num? ?? 0).toInt(),
-      fat: (map['fat'] as num? ?? 0).toInt(),
+      
+      // 3. Update parsing logic to safely handle numbers as doubles
+      // 'num' captures both int and double, then we force .toDouble()
+      calories: (map['calories'] as num? ?? 0).toDouble(),
+      protein: (map['protein'] as num? ?? 0).toDouble(),
+      carbs: (map['carbs'] as num? ?? 0).toDouble(),
+      fat: (map['fat'] as num? ?? 0).toDouble(),
+      
       timestamp: (map['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }

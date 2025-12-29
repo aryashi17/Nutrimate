@@ -325,6 +325,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/models/user_profile.dart';
 import '../profile/health_status_Section.dart'; 
 import '../../core/models/user_profile.dart';
+import '../../core/models/meal_log_entry.dart';
 
 // Enhanced Mess Logger Screen
 // - Improved visual design and palette
@@ -347,6 +348,56 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   final Color mint = const Color(0xFF7EE081);
   final Color amber = const Color(0xFFF4C430);
   final Color waterBlue = const Color(0xFF4FC3F7);
+  Future<void> _logPlateToFirebase() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
+
+  // 1. Calculate totals from your current plate widgets
+  // (Assuming you have variables tracking these, or iterate through your selected items)
+  int totalCalories = 0; 
+  int totalProtein = 0; 
+  int totalCarbs = 0; 
+  int totalFat = 0;
+
+  // EXAMPLE: Iterate through your visible/selected items
+  // You likely have a list of food items for the meal. Loop through them:
+  for (var item in mySelectedItems) {
+     totalCalories += item.calories;
+     totalProtein += item.protein;
+     totalCarbs += item.carbs;
+     totalFat += item.fat;
+  }
+
+  // 2. Create the Log Entry
+  // We save the WHOLE MEAL as one entry (e.g., "Lunch - Mess Hall")
+  final logEntry = MealLogEntry(
+    id: '', // Firestore will generate this
+    name: "Mess Hall - $selectedMealType", // e.g. "Mess Hall - Lunch"
+    calories: totalCalories,
+    protein: totalProtein,
+    carbs: totalCarbs,
+    fat: totalFat,
+    timestamp: DateTime.now(),
+  );
+
+  // 3. Save to the SHARED collection 'food_logs'
+  try {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('food_logs') // <--- CRITICAL: Must match Home Screen
+        .add(logEntry.toMap());
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Plate logged to Dashboard!")),
+      );
+      Navigator.pop(context); // Go back to Dashboard to see the update
+    }
+  } catch (e) {
+    print("Error logging mess meal: $e");
+  }
+}
   // Paste this inside _MessLoggerScreenState, before build()
 Stream<UserProfile?> get userStream {
   final user = FirebaseAuth.instance.currentUser;
@@ -611,7 +662,7 @@ Stream<UserProfile?> get userStream {
             ),
           ),
           const SizedBox(width: 16),
-
+              
           // Title + date
           Expanded(
             child: Column(
