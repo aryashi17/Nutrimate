@@ -9,6 +9,8 @@ import 'package:nutrimate_app/core/services/calculator_engine.dart';
 import 'package:nutrimate_app/core/services/streak_services.dart';
 import '../../core/models/user_profile.dart';
 import '../../core/models/meal_log_entry.dart';
+import '../../core/services/mess_menu_service.dart';
+
 
 // --- FEATURE IMPORTS ---
 import 'package:nutrimate_app/features/hydration/health_insights_screen.dart';
@@ -41,35 +43,42 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   final TextEditingController _foodNameController = TextEditingController();
 
   // Categorized Meal Data (Merged Data Structure)
-  final Map<String, List<Map<String, dynamic>>> mealData = {
-    'Breakfast': [
-      {'name': 'Oats', 'icon': Icons.breakfast_dining, 'portion': 0.8, 'calories': 150},
-      {'name': 'Eggs', 'icon': Icons.egg, 'portion': 0.4, 'calories': 70},
-      {'name': 'Milk', 'icon': Icons.coffee_rounded, 'portion': 0.9, 'calories': 120},
-    ],
-    'Lunch': [
-      {'name': 'Rice', 'icon': Icons.rice_bowl_rounded, 'portion': 0.6, 'calories': 200},
-      {'name': 'Dal', 'icon': Icons.soup_kitchen_rounded, 'portion': 0.7, 'calories': 180},
-      {'name': 'Paneer', 'icon': Icons.restaurant_rounded, 'portion': 0.3, 'calories': 250},
-      {'name': 'Roti', 'icon': Icons.flatware_rounded, 'portion': 0.5, 'calories': 100},
-      {'name': 'Curd', 'icon': Icons.egg_alt_rounded, 'portion': 0.2, 'calories': 60},
-      {'name': 'Salad', 'icon': Icons.eco_rounded, 'portion': 0.8, 'calories': 30},
-    ],
-    'Snacks': [
-      {'name': 'Tea', 'icon': Icons.emoji_food_beverage, 'portion': 0.5, 'calories': 40},
-      {'name': 'Samosa', 'icon': Icons.fastfood, 'portion': 0.3, 'calories': 200},
-    ],
-    'Dinner': [
-      {'name': 'Soup', 'icon': Icons.waves, 'portion': 0.9, 'calories': 80},
-      {'name': 'Sabzi', 'icon': Icons.dinner_dining, 'portion': 0.6, 'calories': 150},
-    ],
-  };
+  Map<String, List<Map<String, dynamic>>> mealData = {};
+bool isMenuLoading = true;
 
-  @override
-  void initState() {
-    super.initState();
-    _determineInitialMeal();
+
+@override
+void initState() {
+  super.initState();
+  _determineInitialMeal();
+  _loadTodayMenu(); // ✅ THIS WAS MISSING
+}
+
+
+Future<void> _loadTodayMenu() async {
+  try {
+    final service = MessMenuService();
+    final menu = await service.getTodayMenu();
+
+    // Normalize Firestore data → UI format
+    menu.forEach((meal, items) {
+      for (final item in items) {
+        item['portion'] = item['defaultPortion'] ?? 0.5;
+        item['icon'] = Icons.restaurant_menu_rounded;
+      }
+    });
+
+    setState(() {
+      mealData = menu;
+      isMenuLoading = false;
+    });
+  } catch (e) {
+    print("❌ Error loading menu: $e");
+    setState(() => isMenuLoading = false);
   }
+}
+
+
 
   // --- LOGIC: Auto-detect meal time (From HEAD concept) ---
   void _determineInitialMeal() {
@@ -373,20 +382,37 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   }
 
   // --- UI: List ---
-  Widget _buildSmoothList() {
-    final items = mealData[selectedMeal] ?? [];
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 500),
-          child: _buildModernFoodRow(item, index),
-        );
-      },
+Widget _buildSmoothList() {
+  if (isMenuLoading) {
+    return const Center(
+      child: CircularProgressIndicator(),
     );
   }
+
+  final items = mealData[selectedMeal] ?? [];
+
+  if (items.isEmpty) {
+    return const Center(
+      child: Text(
+        "No items available",
+        style: TextStyle(color: Colors.white54),
+      ),
+    );
+  }
+
+  return ListView.builder(
+    padding: const EdgeInsets.symmetric(horizontal: 24),
+    itemCount: items.length,
+    itemBuilder: (context, index) {
+      final item = items[index];
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 500),
+        child: _buildModernFoodRow(item, index),
+      );
+    },
+  );
+}
+
 
   Widget _buildModernFoodRow(Map<String, dynamic> item, int index) {
     return Container(
