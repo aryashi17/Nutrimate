@@ -254,26 +254,88 @@ class _SickBayScreenState extends State<SickBayScreen> {
     );
   }
 
+  Color _severityColor(String severity) {
+    switch (severity) {
+      case "severe":
+        return Colors.redAccent;
+      case "moderate":
+        return Colors.orangeAccent;
+      case "mild":
+        return Colors.yellowAccent;
+      default:
+        return const Color(0xFFAAF0D1); // low
+    }
+  }
+
+  String _severityMessage(String severity) {
+    switch (severity) {
+      case "severe":
+        return "⚠️ Symptoms appear serious. Please consult a doctor immediately.";
+      case "moderate":
+        return "⚠️ Monitor closely. Medical attention may be needed.";
+      case "mild":
+        return "🙂 Mild symptoms. Rest and care should help.";
+      default:
+        return "✅ No major concerns detected.";
+    }
+  }
+
+  Widget _buildSeverityBanner(String severity) {
+    final color = _severityColor(severity);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.warning_amber_rounded, color: color),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              _severityMessage(severity),
+              style: TextStyle(color: color, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildResultSection(SickBayResult result) {
+    final color = _severityColor(result.severity);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _buildSeverityBanner(result.severity),
+
         _resultCard(
           title: "Eat",
           icon: Icons.check_circle_outline,
           items: result.eat,
+          accentColor: color,
         ),
         const SizedBox(height: 16),
+
         _resultCard(
           title: "Avoid",
           icon: Icons.cancel_outlined,
           items: result.avoid,
+          accentColor: color,
         ),
         const SizedBox(height: 16),
+
         _resultCard(
           title: "Care",
           icon: Icons.favorite_outline,
           items: result.care,
+          accentColor: color,
         ),
       ],
     );
@@ -283,6 +345,7 @@ class _SickBayScreenState extends State<SickBayScreen> {
     required String title,
     required IconData icon,
     required List<String> items,
+    required Color accentColor,
   }) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -296,7 +359,10 @@ class _SickBayScreenState extends State<SickBayScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, color: const Color(0xFFAAF0D1)),
+              Icon(
+                icon,
+                color: accentColor,
+              ),
               const SizedBox(width: 8),
               Text(
                 title,
