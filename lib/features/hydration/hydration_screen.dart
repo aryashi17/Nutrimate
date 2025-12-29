@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:nutrimate_app/core/services/calculator_engine.dart';
 import '../widgets/water_button.dart'; 
 import '../widgets/bottle_visual.dart';
 
@@ -10,60 +12,26 @@ class HydrationScreen extends StatefulWidget {
 }
 
 class _HydrationScreenState extends State<HydrationScreen> {
-  int _totalDrank = 0; 
-  // This _goal can now be changed based on user profile (e.g., weight/height)
-  int _goal = 2000; 
-  int _bottlesCompleted = 0; 
 
-  void _addWater(int amount) {
-    setState(() {
-      _totalDrank += amount;
-      
-      // If the current bottle is full, add a reward icon and reset for the next one
-      if (_totalDrank >= _goal) {
-        _bottlesCompleted++;
-        _totalDrank = 0; 
-        _showSuccessSnackBar();
-      }
-    });
-  }
-
-  void _showSuccessSnackBar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Bottle Finished! New icon added. 🍾"),
-        backgroundColor: Colors.cyan,
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _showThirstWarning() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("I've noticed you're thirsty, are you feeling okay?"),
-        backgroundColor: Colors.orangeAccent,
-        duration: Duration(seconds: 3),
-      ),
-    );
-  }
-
-  // UPDATED: Funny Status now changes based on how many bottles were already finished
-  String _getFunnyStatus() {
-    if (_bottlesCompleted > 0) {
-      if (_bottlesCompleted >= 3) return "Champion Level: Basically a Fish 🐟";
-      return "On to bottle number ${_bottlesCompleted + 1}! You're a pro! 🚀";
+  // Logic for status messages
+  String _getFunnyStatus(int total, int goal, int completed) {
+    if (completed > 0) {
+      if (completed >= 3) return "Champion Level: Basically a Fish 🐟";
+      return "On to bottle number ${completed + 1}! You're a pro! 🚀";
     }
 
-    double progress = _totalDrank / _goal;
+    double progress = total / goal;
     if (progress >= 0.75) return "Look at you, Hydration Hero! 🦸";
     if (progress >= 0.50) return "Halfway! Your skin is glowing (probably) ✨";
     if (progress >= 0.25) return "Emotional Support Water Level: LOW ⚠️";
-    return "Your kidneys are sending a search party 🔍"; // Only shows for 1st bottle
+    return "Your kidneys are sending a search party 🔍";
   }
 
   @override
   Widget build(BuildContext context) {
+    // This allows the screen to listen to the engine
+    final engine = Provider.of<CalculatorEngine>(context);
+
     return Scaffold(
       appBar: AppBar(title: const Text("Hydration Tracker")),
       body: SingleChildScrollView(
@@ -79,14 +47,14 @@ class _HydrationScreenState extends State<HydrationScreen> {
                   width: 180, 
                   height: 180,
                   child: CircularProgressIndicator(
-                    value: (_totalDrank / _goal).clamp(0.0, 1.0),
+                    value: (engine.totalDrank / engine.goal).clamp(0.0, 1.0),
                     strokeWidth: 10,
                     backgroundColor: Colors.white10,
                     valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4FC3F7)),
                   ),
                 ),
                 Text(
-                  "${((_totalDrank / _goal) * 100).toInt()}%",
+                  "${((engine.totalDrank / engine.goal) * 100).toInt()}%",
                   style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Color(0xFFAAF0D1)),
                 ),
               ],
@@ -95,42 +63,35 @@ class _HydrationScreenState extends State<HydrationScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
               child: Text(
-                _getFunnyStatus(),
+                _getFunnyStatus(engine.totalDrank, engine.goal, engine.bottlesCompleted),
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 18, color: Colors.white, fontStyle: FontStyle.italic),
               ),
             ),
 
             Text(
-              "$_totalDrank / $_goal ml",
+              "${engine.totalDrank} / ${engine.goal} ml",
               style: const TextStyle(fontSize: 20, color: Colors.white54),
             ),
 
             const SizedBox(height: 30),
 
-            // BOTTLE AREA: Main bottle in middle, icons on the right
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(width: 50), // Balance for the icons on the right
-                
-                BottleVisual(fillLevel: _totalDrank / _goal),
-
-                // Vertical column of reward icons
+                const SizedBox(width: 50), 
+                BottleVisual(fillLevel: engine.totalDrank / engine.goal),
+                // Reward Icons
                 Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(
-                      _bottlesCompleted,
+                      engine.bottlesCompleted,
                       (index) => const Padding(
                         padding: EdgeInsets.symmetric(vertical: 4.0),
-                        child: Icon(
-                          Icons.local_drink_rounded, 
-                          color: Color(0xFFAAF0D1),
-                          size: 28,
-                        ),
+                        child: Icon(Icons.local_drink_rounded, color: Color(0xFFAAF0D1), size: 28),
                       ),
                     ),
                   ),
@@ -140,20 +101,17 @@ class _HydrationScreenState extends State<HydrationScreen> {
 
             const SizedBox(height: 30),
             
-            // Interaction Buttons
-            WaterButtons(onAddWater: _addWater),
+            // Call the engine's addWater method
+            WaterButtons(onAddWater: (amount) => engine.addWater(amount)),
             
             const SizedBox(height: 20),
             
             ElevatedButton(
-              onPressed: () => setState(() {
-                _totalDrank = 0;
-                _bottlesCompleted = 0; // Fully reset the day
-              }),
+              onPressed: () => engine.resetHydration(),
               child: const Text("Reset Day"),
             ),
             
-            // MANUAL OVERRIDE SECTION
+            // Manual Slider using engine data
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               padding: const EdgeInsets.all(15),
@@ -163,21 +121,16 @@ class _HydrationScreenState extends State<HydrationScreen> {
               ),
               child: Column(
                 children: [
-                  const Text(
-                    "My bottle had a leak, or I'm just bad at tracking. Don't judge.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFFAAF0D1), fontWeight: FontWeight.bold, fontSize: 14),
-                  ),
+                  const Text("Manual Adjustment", style: TextStyle(color: Color(0xFFAAF0D1))),
                   Slider(
-                    value: _totalDrank.toDouble().clamp(0, _goal.toDouble()),
+                    value: engine.totalDrank.toDouble().clamp(0, engine.goal.toDouble()),
                     min: 0,
-                    max: _goal.toDouble(),
+                    max: engine.goal.toDouble(),
                     activeColor: const Color(0xFFAAF0D1),
-                    inactiveColor: Colors.white10,
                     onChanged: (newValue) {
-                      setState(() {
-                        _totalDrank = newValue.toInt();
-                      });
+                      // Directly update engine
+                      engine.totalDrank = newValue.toInt();
+                      engine.notifyListeners(); 
                     },
                   ),
                 ],
