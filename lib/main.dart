@@ -3,18 +3,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
-// Service & Core Imports
+// --- SERVICE & CORE IMPORTS ---
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/calculator_engine.dart';
 import 'core/services/health_trivia_service.dart';
 import 'core/services/streak_services.dart';
 
-// Feature Imports
+// --- FEATURE IMPORTS ---
 import 'features/auth/login_screen.dart';
 import 'features/menu_view/mess_logger_screen.dart';
 import 'features/profile/profile_screen.dart';
-import 'features/reports/summary_screen.dart'; // Import for the charts icon
+import '../features/dashboard/dashboard_screen.dart'; 
+import 'features/reports/summary_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        // Using ChangeNotifierProvider to allow UI updates from CalculatorEngine
         ChangeNotifierProvider(create: (_) => CalculatorEngine()),
       ],
       child: const MyApp(),
@@ -32,20 +34,22 @@ void main() async {
   );
 }
 
+// 1. THE APP ROOT
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Nutrimate',
+      title: 'NutriMate',
       theme: AppTheme.darkTheme,
-      home: const AuthWrapper(), // Changed to AuthWrapper to handle login stat
+      debugShowCheckedModeBanner: false,
+      home: const AuthWrapper(),
     );
   }
 }
 
+// 2. THE GATEKEEPER (AuthWrapper)
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 
@@ -54,20 +58,27 @@ class AuthWrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
+        // A. Loading
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            backgroundColor: Color(0xFF121212),
+            body: Center(child: CircularProgressIndicator(color: Color(0xFFAAF0D1))),
+          );
         }
+        // B. Logged In -> Go to The Hub
         if (snapshot.hasData) {
           // TRICK: Trigger data fetch here once user is confirmed
           Provider.of<CalculatorEngine>(context, listen: false).fetchInitialData();
           return const NeonWelcomeScreen();
         }
-        return LoginScreen();
+        // C. Not Logged In -> Go to Login
+        return const LoginScreen();
       },
     );
   }
 }
 
+// 3. THE CENTRAL HUB (NeonWelcomeScreen)
 class NeonWelcomeScreen extends StatelessWidget {
   const NeonWelcomeScreen({super.key});
 
@@ -107,6 +118,7 @@ class NeonWelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // FIX: Remove '!' to prevent "Unexpected null value" error
     final user = FirebaseAuth.instance.currentUser;
+    final secondaryColor = AppTheme.neonBlue;
     final streakService = StreakService();
 
     return Scaffold(
@@ -115,7 +127,7 @@ class NeonWelcomeScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          // CHARTS ICON: Navigation for Member 4
+          // CHARTS ICON: Navigation for Summary
           icon: const Icon(Icons.bar_chart, color: Colors.white70),
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SummaryScreen())),
         ),
@@ -152,11 +164,12 @@ class NeonWelcomeScreen extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // --- HEADER ---
               Text(
                 "WELCOME TO\nNUTRIMATE",
                 textAlign: TextAlign.center,
@@ -168,7 +181,7 @@ class NeonWelcomeScreen extends StatelessWidget {
                   height: 1.2,
                   shadows: [
                     Shadow(blurRadius: 10.0, color: AppTheme.neonPurple, offset: Offset.zero),
-                    Shadow(blurRadius: 20.0, color: AppTheme.neonPurple.withOpacity(0.7), offset: Offset.zero),
+                    Shadow(blurRadius: 20.0, color: AppTheme.neonPurple.withValues(alpha: 0.7), offset: Offset.zero),
                   ],
                 ),
               ),
@@ -176,18 +189,33 @@ class NeonWelcomeScreen extends StatelessWidget {
               // FIX: Safe access to email
               Text("Logged in as: ${user?.email ?? 'Guest'}", style: const TextStyle(color: Colors.white54, fontSize: 14)),
               const SizedBox(height: 50),
-              _buildNeonButton(
-                text: "ENTER MESS HALL",
-                color: AppTheme.neonBlue,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MessLoggerScreen())),
+
+              // --- BUTTON 1: DASHBOARD (From HEAD) ---
+              _buildMenuButton(
+                context, 
+                label: "OPEN DASHBOARD",
+                color: Colors.white, 
+                textColor: Colors.black,
+                icon: Icons.dashboard_customize,
+                // Note: Ensure HomeScreen is exported from dashboard_screen.dart
+                destination: const HomeScreen(),
               ),
+
               const SizedBox(height: 20),
-              _buildNeonButton(
-                text: "SETUP BODY PROFILE",
-                color: const Color(0xFFAAF0D1),
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen())),
+
+              // --- BUTTON 2: MESS HALL (Merged) ---
+              _buildMenuButton(
+                context, 
+                label: "FUEL STATION",
+                color: secondaryColor,
+                textColor: Colors.black,
+                icon: Icons.restaurant,
+                destination: const MessLoggerScreen(),
               ),
+
               const SizedBox(height: 40),
+              
+              // --- LOGOUT ---
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
@@ -196,6 +224,7 @@ class NeonWelcomeScreen extends StatelessWidget {
                     foregroundColor: AppTheme.neonPurple,
                     side: const BorderSide(color: AppTheme.neonPurple, width: 2),
                     padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: const Text("SIGN OUT", style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
@@ -207,19 +236,36 @@ class NeonWelcomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNeonButton({required String text, required Color color, required VoidCallback onTap}) {
+  // Helper widget to make buttons look consistent (Kept the HEAD version with Icons)
+  Widget _buildMenuButton(BuildContext context, {
+    required String label, 
+    required Color color, 
+    required Color textColor,
+    required IconData icon,
+    required Widget destination,
+  }) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onTap,
+      child: ElevatedButton.icon(
+        icon: Icon(icon, color: textColor),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => destination),
+          );
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
-          foregroundColor: Colors.black,
+          foregroundColor: textColor,
           padding: const EdgeInsets.symmetric(vertical: 18),
-          shadowColor: color,
-          elevation: 12,
+          elevation: 10,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shadowColor: color.withValues(alpha: 0.5),
         ),
-        child: Text(text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+        label: Text(
+          label,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+        ),
       ),
     );
   }
