@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:nutrimate_app/core/services/calculator_engine.dart';
+import 'package:nutrimate_app/core/services/streak_services.dart';
+import 'package:nutrimate_app/features/hydration/health_insights_screen.dart';
+import 'package:provider/provider.dart';
 import '../plate_mapper/plate_mapper_screen.dart';
 import '../profile/profile_screen.dart';
 import '../sick_bay/sick_bay_screen.dart';
@@ -103,6 +107,30 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
           ),
         ],
       ),
+
+      bottomNavigationBar: Container(
+    padding: const EdgeInsets.all(12),
+    color: bgDark,
+    child: ElevatedButton(
+      onPressed: () {
+        // Navigates to the Gap Analysis screen you built
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HealthInsightsScreen()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.orangeAccent, // Match your target UI
+        foregroundColor: Colors.black,
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      child: const Text(
+        "VIEW DIET GAP & WARNINGS",
+        style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1),
+      ),
+    ),
+  ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: mint,
         onPressed: () => _showEditSheet(),
@@ -217,8 +245,19 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
                   final mealItems = mealData[selectedMeal]!;
                   final i = mealItems.indexWhere((m) => m['name'] == change['food']);
                   if (i != -1) mealItems[i]['portion'] = change['fill'];
+
+                  // --- ADD THIS POINT HERE ---
+        // This sends the data to your CalculatorEngine for the charts
+        Provider.of<CalculatorEngine>(context, listen: false)
+            .addFood(change['food'], change['fill']);
                 }
               });
+
+              await StreakService().updateStreak();
+              Navigator.push(
+      context, 
+      MaterialPageRoute(builder: (_) => const HealthInsightsScreen())
+    );
             }
           },
           onLongPress: () => _showDeleteDialog(index),
