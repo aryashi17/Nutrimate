@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+// Ensure these imports match your actual file structure
 import '../../core/models/user_profile.dart';
-import '../../core/models/meal_log_entry.dart'; // <--- USING THE MASTER MODEL
+import '../../core/models/meal_log_entry.dart'; 
 import '../profile/profile_screen.dart';
 import '../scanner/add_food_screen.dart'; 
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  // Helper to get the start of the day for filtering logs
   DateTime get _startOfDay {
     final now = DateTime.now();
     return DateTime(now.year, now.month, now.day);
@@ -41,10 +43,11 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      // 1. First Stream: Get User GOALS
+      // 1. First Stream: Get User GOALS (Profile)
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
         builder: (context, userSnapshot) {
+          // Handle Profile Loading
           if (userSnapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: mint));
           }
@@ -59,27 +62,38 @@ class HomeScreen extends StatelessWidget {
             stream: FirebaseFirestore.instance
                 .collection('users')
                 .doc(user.uid)
-                .collection('food_logs') // <--- ENSURE ALL LOGS SAVE HERE
+                .collection('food_logs') // Ensure this matches your Firestore collection name
                 .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(_startOfDay))
                 .snapshots(),
             builder: (context, foodSnapshot) {
               
-              int currentCalories = 0;
-              int currentProtein = 0;
-              int currentCarbs = 0;
-              int currentFat = 0;
+              // Handle Logs Loading
+              if (!foodSnapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-              if (foodSnapshot.hasData && foodSnapshot.data!.docs.isNotEmpty) {
-                for (var doc in foodSnapshot.data!.docs) {
-                  // HERE IS THE FIX: Use MealLogEntry safely
-                  var food =meal_log_entry.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+              // --- CALCULATION LOGIC START ---
+              // Initialize counters as doubles
+              double currentCalories = 0;
+              double currentProtein = 0;
+              double currentCarbs = 0;
+              double currentFat = 0;
+
+              // Loop through documents and sum them up
+              for (var doc in foodSnapshot.data!.docs) {
+                try {
+                  var food = MealLogEntry.fromMap(doc.data() as Map<String, dynamic>, doc.id);
                   currentCalories += food.calories;
                   currentProtein += food.protein;
                   currentCarbs += food.carbs;
                   currentFat += food.fat;
+                } catch (e) {
+                  print("Error parsing food item: $e");
                 }
               }
+              // --- CALCULATION LOGIC END ---
 
+              // Build the UI with the calculated data
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -110,10 +124,14 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // --- WIDGET HELPERS ---
-  Widget _buildCalorieCard(UserProfile profile, int current, Color color) {
+  // --- WIDGET HELPERS (Updated to accept doubles) ---
+
+  Widget _buildCalorieCard(UserProfile profile, double current, Color color) {
+    // Safely calculate progress
     double progress = profile.dailyCalorieTarget > 0 ? current / profile.dailyCalorieTarget : 0;
-    int remaining = profile.dailyCalorieTarget - current;
+    
+    // Calculate remaining
+    double remaining = profile.dailyCalorieTarget - current;
     if (remaining < 0) remaining = 0;
 
     return Container(
@@ -144,7 +162,7 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text("Calories Left", style: TextStyle(color: Colors.white54, fontSize: 14)),
-              Text("$remaining", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+              Text("${remaining.toInt()}", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
               Text("Goal: ${profile.dailyCalorieTarget}", style: const TextStyle(color: Colors.white38, fontSize: 12)),
             ],
           )
@@ -153,7 +171,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMacroCard(String label, int current, int target, Color color) {
+  Widget _buildMacroCard(String label, double current, int target, Color color) {
     double progress = target == 0 ? 0 : current / target;
     return Container(
       padding: const EdgeInsets.all(16),
@@ -166,7 +184,8 @@ class HomeScreen extends StatelessWidget {
         children: [
           Text(label, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Text("$current / $target g", style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+          Text("${current.toInt()} / $target g", style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
           LinearProgressIndicator(value: progress > 1 ? 1 : progress, backgroundColor: Colors.white10, color: color),
         ],
       ),

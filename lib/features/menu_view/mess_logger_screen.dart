@@ -351,13 +351,14 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   Future<void> _logPlateToFirebase() async {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) return;
-
+List<dynamic> mySelectedItems = []; // Or List<MenuItem> if you have a model
+  String selectedMealType = "Lunch";  // Or specific default value
   // 1. Calculate totals from your current plate widgets
   // (Assuming you have variables tracking these, or iterate through your selected items)
-  int totalCalories = 0; 
-  int totalProtein = 0; 
-  int totalCarbs = 0; 
-  int totalFat = 0;
+double totalCalories = 0;
+double totalProtein = 0;
+double totalCarbs = 0;
+double totalFat = 0;
 
   // EXAMPLE: Iterate through your visible/selected items
   // You likely have a list of food items for the meal. Loop through them:
