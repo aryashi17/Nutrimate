@@ -1,1 +1,42 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"nutimate-app","appId":"1:884200536012:android:9c012994c9d129527d0f69","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"nutimate-app","configurations":{"android":"1:884200536012:android:9c012994c9d129527d0f69","ios":"1:884200536012:ios:f328e844b9b1d9f77d0f69","macos":"1:884200536012:ios:f328e844b9b1d9f77d0f69","web":"1:884200536012:web:84aa5072fad0bd6c7d0f69","windows":"1:884200536012:web:787ed5dea2664b6a7d0f69"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "nutimate-app",
+          "appId": "1:884200536012:android:9c012994c9d129527d0f69",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "nutimate-app",
+          "configurations": {
+            "android": "1:884200536012:android:9c012994c9d129527d0f69",
+            "ios": "1:884200536012:ios:f328e844b9b1d9f77d0f69",
+            "macos": "1:884200536012:ios:f328e844b9b1d9f77d0f69",
+            "web": "1:884200536012:web:84aa5072fad0bd6c7d0f69",
+            "windows": "1:884200536012:web:787ed5dea2664b6a7d0f69"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ]
+}

@@ -8,6 +8,9 @@ import '../../core/models/meal_log_entry.dart';
 import '../profile/profile_screen.dart';
 import '../scanner/add_food_screen.dart'; 
 
+// --- IMPORT THE SUMMARY SCREEN HERE ---
+import '../reports/summary_screen.dart'; 
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -16,7 +19,7 @@ class HomeScreen extends StatelessWidget {
     final now = DateTime.now();
     return DateTime(now.year, now.month, now.day);
   }
-
+    
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -114,6 +117,69 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 25),
                     _buildWaterCard(profile.dailyWaterTarget, mint),
+                    
+                    const SizedBox(height: 25), // Spacing before summary card
+
+                    // --- NEW SUMMARY CARD ADDED HERE ---
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const SummaryScreen()));
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          // Gradient for a premium look
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF6A11CB), Color(0xFF2575FC)], 
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF2575FC).withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.insights, color: Colors.white, size: 28),
+                            ),
+                            const SizedBox(width: 20),
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "View Summary",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  "Check your daily progress",
+                                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
+                            const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 18),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // -----------------------------------
                   ],
                 ),
               );
@@ -196,9 +262,9 @@ class HomeScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [Colors.blue.shade900.withValues(alpha: 0.4), const Color(0xFF1E1E1E)]),
+        gradient: LinearGradient(colors: [Colors.blue.shade900.withOpacity(0.4), const Color(0xFF1E1E1E)]),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+        border: Border.all(color: Colors.blue.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

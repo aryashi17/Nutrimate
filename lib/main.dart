@@ -3,14 +3,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
-// --- IMPORTS (Ensure these paths match your project) ---
+// --- SERVICE & CORE IMPORTS ---
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
-import 'core/services/calculator_engine.dart'; // Or health_calculator.dart if you renamed it
+import 'core/services/calculator_engine.dart';
+import 'core/services/health_trivia_service.dart';
+import 'core/services/streak_services.dart';
+
+// --- FEATURE IMPORTS ---
 import 'features/auth/login_screen.dart';
 import 'features/menu_view/mess_logger_screen.dart';
 import 'features/profile/profile_screen.dart';
-import 'features/dashboard/dashboard_screen.dart'; 
+import '../features/dashboard/dashboard_screen.dart'; 
+import 'features/reports/summary_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,8 +26,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        // Ensure you have this provider if your app uses it, otherwise remove
-        Provider(create: (_) => CalculatorEngine()), 
+        // Using ChangeNotifierProvider to allow UI updates from CalculatorEngine
+        ChangeNotifierProvider(create: (_) => CalculatorEngine()),
       ],
       child: const MyApp(),
     ),
@@ -39,16 +44,12 @@ class MyApp extends StatelessWidget {
       title: 'NutriMate',
       theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
-      // We point 'home' to the AuthWrapper to decide where to go
       home: const AuthWrapper(),
     );
   }
 }
 
 // 2. THE GATEKEEPER (AuthWrapper)
-// Decides: Are we logged in? 
-// Yes -> Show NeonWelcomeScreen (The Hub)
-// No  -> Show LoginScreen
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 
@@ -66,6 +67,8 @@ class AuthWrapper extends StatelessWidget {
         }
         // B. Logged In -> Go to The Hub
         if (snapshot.hasData) {
+          // TRICK: Trigger data fetch here once user is confirmed
+          Provider.of<CalculatorEngine>(context, listen: false).fetchInitialData();
           return const NeonWelcomeScreen();
         }
         // C. Not Logged In -> Go to Login
@@ -76,19 +79,90 @@ class AuthWrapper extends StatelessWidget {
 }
 
 // 3. THE CENTRAL HUB (NeonWelcomeScreen)
-// This is your main menu. I added a button for "Dashboard" so HomeScreen isn't lost.
-// 3. THE CENTRAL HUB (NeonWelcomeScreen)
 class NeonWelcomeScreen extends StatelessWidget {
   const NeonWelcomeScreen({super.key});
 
+  void _showTrivia(BuildContext context) {
+    // FIX: Using null-aware operators to prevent red screen crash
+    final trivia = HealthTrivia.getTodaysTrivia();
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(25),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A1A),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          border: Border.all(color: AppTheme.neonPurple.withOpacity(0.3)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(10))),
+            const SizedBox(height: 20),
+            const Text("💡 DAILY HEALTH GK", style: TextStyle(color: Colors.white54, fontSize: 10, letterSpacing: 2)),
+            const SizedBox(height: 15),
+            // FIX: Prevent null pointer exception
+            Text(trivia['q'] ?? "Loading...", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const Divider(height: 30, color: Colors.white10),
+            Text(trivia['a'] ?? "", textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFAAF0D1), fontSize: 15)),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // FIX: Remove '!' to prevent "Unexpected null value" error
     final user = FirebaseAuth.instance.currentUser;
-    // final primaryColor = const Color(0xFFAAF0D1); // Mint (No longer needed for the removed button)
     final secondaryColor = AppTheme.neonBlue;
+    final streakService = StreakService();
 
     return Scaffold(
       backgroundColor: AppTheme.charcoal,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          // CHARTS ICON: Navigation for Summary
+          icon: const Icon(Icons.bar_chart, color: Colors.white70),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SummaryScreen())),
+        ),
+        title: Center(
+          child: StreamBuilder<int>(
+            stream: streakService.streakStream,
+            builder: (context, snapshot) {
+              int streakCount = snapshot.data ?? 0;
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: streakCount > 0 ? Colors.orangeAccent : Colors.white24),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.local_fire_department, color: streakCount > 0 ? Colors.orangeAccent : Colors.white24, size: 18),
+                    const SizedBox(width: 4),
+                    Text("$streakCount", style: TextStyle(color: streakCount > 0 ? Colors.orangeAccent : Colors.white24, fontWeight: FontWeight.bold, fontSize: 14)),
+                  ],
+                ),
+              );
+            }
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.lightbulb_outline, color: Colors.amberAccent),
+            onPressed: () => _showTrivia(context),
+          ),
+          const SizedBox(width: 10),
+        ],
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -112,25 +186,24 @@ class NeonWelcomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
-                "Logged in as: ${user?.email ?? 'Student'}",
-                style: const TextStyle(color: Colors.white54, fontSize: 14),
-              ),
+              // FIX: Safe access to email
+              Text("Logged in as: ${user?.email ?? 'Guest'}", style: const TextStyle(color: Colors.white54, fontSize: 14)),
               const SizedBox(height: 50),
 
-              // --- BUTTON 1: DASHBOARD ---
+              // --- BUTTON 1: DASHBOARD (From HEAD) ---
               _buildMenuButton(
                 context, 
                 label: "OPEN DASHBOARD",
                 color: Colors.white, 
                 textColor: Colors.black,
                 icon: Icons.dashboard_customize,
+                // Note: Ensure HomeScreen is exported from dashboard_screen.dart
                 destination: const HomeScreen(),
               ),
 
               const SizedBox(height: 20),
 
-              // --- BUTTON 2: MESS HALL ---
+              // --- BUTTON 2: MESS HALL (Merged) ---
               _buildMenuButton(
                 context, 
                 label: "FUEL STATION",
@@ -139,10 +212,10 @@ class NeonWelcomeScreen extends StatelessWidget {
                 icon: Icons.restaurant,
                 destination: const MessLoggerScreen(),
               ),
-              
-              const SizedBox(height: 40),
 
-              // --- BUTTON 3: LOGOUT ---
+              const SizedBox(height: 40),
+              
+              // --- LOGOUT ---
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
@@ -153,10 +226,7 @@ class NeonWelcomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text(
-                    "SIGN OUT",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  child: const Text("SIGN OUT", style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -166,7 +236,7 @@ class NeonWelcomeScreen extends StatelessWidget {
     );
   }
 
-  // Helper widget to make buttons look consistent
+  // Helper widget to make buttons look consistent (Kept the HEAD version with Icons)
   Widget _buildMenuButton(BuildContext context, {
     required String label, 
     required Color color, 
@@ -200,37 +270,3 @@ class NeonWelcomeScreen extends StatelessWidget {
     );
   }
 }
-
-  // Helper widget to make buttons look consistent
-  Widget _buildMenuButton(BuildContext context, {
-    required String label, 
-    required Color color, 
-    required Color textColor,
-    required IconData icon,
-    required Widget destination,
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        icon: Icon(icon, color: textColor),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => destination),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: textColor,
-          padding: const EdgeInsets.symmetric(vertical: 18),
-          elevation: 10,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          shadowColor: color.withValues(alpha: 0.5),
-        ),
-        label: Text(
-          label,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.0),
-        ),
-      ),
-    );
-  }
