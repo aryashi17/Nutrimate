@@ -94,22 +94,31 @@ class CalculatorEngine extends ChangeNotifier{
     notifyListeners();
 
     // --- NEW: SYNC TO FIREBASE FOR CHARTS ---
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final String dateId = DateTime.now().toIso8601String().split('T')[0]; // e.g., "2023-10-27"
-      
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('logs')
-          .doc(dateId) // Use date as ID to overwrite/update the same day's total
-          .set({
-        'totalProtein': currentProtein,
-        'totalCarbs': currentCarbs,
-        'timestamp': DateTime.now().toIso8601String(),
-        'dateLabel': "${DateTime.now().day} ${MonthLabels.short[DateTime.now().month]}",
-        'water': 0.0, // Should be updated via HydrationScreen
-      }, SetOptions(merge: true)); // Use merge to avoid overwriting water logs
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final String dateId = DateTime.now().toIso8601String().split('T')[0]; // e.g., "2023-10-27"
+        
+        print('CalculatorEngine: Syncing food data to Firebase for user ${user.uid}');
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('logs')
+            .doc(dateId) // Use date as ID to overwrite/update the same day's total
+            .set({
+          'totalProtein': currentProtein,
+          'totalCarbs': currentCarbs,
+          'timestamp': DateTime.now().toIso8601String(),
+          'dateLabel': "${DateTime.now().day} ${MonthLabels.short[DateTime.now().month]}",
+          'water': 0.0, // Should be updated via HydrationScreen
+        }, SetOptions(merge: true)); // Use merge to avoid overwriting water logs
+        print('CalculatorEngine: Successfully synced food data');
+      } else {
+        print('CalculatorEngine: No authenticated user, skipping Firebase sync');
+      }
+    } catch (e) {
+      print('CalculatorEngine: Error syncing to Firebase: $e');
+      // Don't rethrow - we don't want food logging to fail because of sync issues
     }
   }
 
