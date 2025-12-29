@@ -30,21 +30,27 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   # State Management
   provider: ^6.1.5+1 
+
   # Data & Backend
   firebase_core: ^4.3.0
   cloud_firestore: ^6.1.1
+  firebase_auth: ^6.1.3
+
   # Utils
   uuid: ^4.0.0
   intl: ^0.20.2
-  # UI Widgets for others
-  flutter_svg: ^2.0.9 # For Member 1
-  fl_chart: ^1.1.1 # For Member 4 (Hydration)
-  google_ml_kit: ^0.20.0 # For Member 3 (Scanner)
-  firebase_auth: ^6.1.3
   shared_preferences: ^2.5.4
 
+  # UI & Charts
+  flutter_svg: ^2.0.9 
+  fl_chart: ^0.70.0 # Kept the newer version for your Member 4 request
+  
+  # Scanner
+  google_ml_kit: ^0.20.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/food_item.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Add this import
+import 'package:firebase_auth/firebase_auth.dart';    // Add this import
 
 class CalcResult {
   final double grams;
@@ -52,19 +54,63 @@ class CalculatorEngine extends ChangeNotifier{
     "Oats": {"p": 10.0, "c": 50.0},
     "Roti": {"p": 4.0, "c": 20.0},
   };
+  Future<void> fetchInitialData() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
 
-  void addFood(String name, double portion) {
+  final String dateId = DateTime.now().toIso8601String().split('T')[0];
+  
+  try {
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('logs')
+        .doc(dateId)
+        .get();
+
+    if (doc.exists) {
+      final data = doc.data()!;
+      // Update local variables with what's already in the cloud
+      currentProtein = (data['totalProtein'] ?? 0.0).toDouble();
+      currentCarbs = (data['totalCarbs'] ?? 0.0).toDouble();
+      notifyListeners();
+    }
+  } catch (e) {
+    debugPrint("Error fetching daily start: $e");
+  }
+}
+
+  Future<void> addFood(String name, double portion) async { // Make this async
     checkAndResetForNewDay();
-    // Look for the food in our library, or use a "Standard Meal" fallback
+    
     final nutrients = foodLibrary.entries
         .firstWhere((e) => name.contains(e.key), 
         orElse: () => const MapEntry("Other", {"p": 10.0, "c": 30.0}))
         .value;
 
-    currentProtein += nutrients["p"]! * portion;
-    currentCarbs += nutrients["c"]! * portion;
+    currentProtein += (nutrients["p"] ?? 0.0) * portion;
+    currentCarbs += (nutrients["c"] ?? 0.0) * portion;
 
-notifyListeners();
+    notifyListeners();
+
+    // --- NEW: SYNC TO FIREBASE FOR CHARTS ---
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final String dateId = DateTime.now().toIso8601String().split('T')[0]; // e.g., "2023-10-27"
+      
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('logs')
+          .doc(dateId) // Use date as ID to overwrite/update the same day's total
+          .set({
+        'totalProtein': currentProtein,
+        'totalCarbs': currentCarbs,
+        'timestamp': DateTime.now().toIso8601String(),
+        'dateLabel': "${DateTime.now().day} ${MonthLabels.short[DateTime.now().month]}",
+        'water': 0.0, // Should be updated via HydrationScreen
+      }, SetOptions(merge: true)); // Use merge to avoid overwriting water logs
+    }
   }
 
   // Inside calculator_engine.dart
@@ -81,4 +127,11 @@ String getEmergencyFix() {
   }
   return "✅ You're all set for tonight. Sleep well!";
 }
+}
+
+class MonthLabels {
+  static const Map<int, String> short = {
+    1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
+    7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec',
+  };
 }

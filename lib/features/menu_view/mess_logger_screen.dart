@@ -7,6 +7,7 @@ import '../plate_mapper/plate_mapper_screen.dart';
 import '../profile/profile_screen.dart';
 import '../sick_bay/sick_bay_screen.dart';
 import '../hydration/hydration_screen.dart';
+import 'package:nutrimate_app/features/reports/summary_screen.dart';
 
 class MessLoggerScreen extends StatefulWidget {
   const MessLoggerScreen({super.key});
@@ -83,6 +84,10 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
         title: const Text('NUTRIMATE', 
           style: TextStyle(letterSpacing: 3, fontWeight: FontWeight.w900, fontSize: 14, color: Colors.white)),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.analytics_outlined, color: Colors.orangeAccent),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SummaryScreen())),
+          ),
           _buildActionBtn('Sick Bay', coral, Icons.local_hospital_outlined, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SickBayScreen()))),
           _buildActionBtn('Hydration', waterBlue, Icons.water_drop_outlined, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HydrationScreen()))),
         ],
