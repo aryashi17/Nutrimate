@@ -23,7 +23,7 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
   double fillLevel = 0.0;
   String selectedSection = "Main";
   String activeTemplate = "Thali"; // Thali, Balanced, or Single Bowl
-
+  
   // Plate Memory System
   final Map<String, String> plateOccupancy = {}; // section -> foodName
   final Map<String, double> sectionFillLevels = {}; // section -> fill percentage

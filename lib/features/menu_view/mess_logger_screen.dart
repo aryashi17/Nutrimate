@@ -18,7 +18,6 @@ import '../sick_bay/sick_bay_screen.dart';
 import '../hydration/hydration_screen.dart';
 import '../profile/health_status_Section.dart'; 
 
-
 class MessLoggerScreen extends StatefulWidget {
   const MessLoggerScreen({super.key});
 
