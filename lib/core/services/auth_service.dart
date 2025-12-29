@@ -43,7 +43,7 @@ class AuthService {
       }
     } catch (e) {
       print("Google Sign In Error: $e");
-      throw e;
+      rethrow;
     }
   }
 
@@ -57,7 +57,7 @@ class AuthService {
         uid: result.user!.uid, email: email, name: name
       );
       await _db.collection('users').doc(newUser.uid).set(newUser.toMap());
-    } catch (e) { throw e; }
+    } catch (e) { rethrow; }
   }
 
   Future<void> signIn(String email, String password) async {

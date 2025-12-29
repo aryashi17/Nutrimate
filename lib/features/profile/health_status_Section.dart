@@ -53,7 +53,7 @@ class HealthStatusSection extends StatelessWidget {
     final Color mint = const Color(0xFF7EE081);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF17201B),
         borderRadius: BorderRadius.circular(20),
@@ -63,8 +63,8 @@ class HealthStatusSection extends StatelessWidget {
         children: [
           // --- PROTEIN CIRCLE ---
           SizedBox(
-            height: 65,
-            width: 65,
+            height: 55,
+            width: 55,
             child: Stack(
               alignment: Alignment.center,
               children: [
