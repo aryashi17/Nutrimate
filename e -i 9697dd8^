@@ -1,0 +1,22 @@
+[33mededc1f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Remove service account key from repo
+[33m9697dd8[m Added menu to database, integrate it with mess logger and made hydration page functional.
+[33m197f938[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Changed hydration page to use data from firestore.
+[33m348992c[m Merge branch 'main' of github.com:aryashi17/Nutrimate
+[33mda9acaf[m .
+[33m440850b[m changes in dashboard lil
+[33m3dbdc89[m Your commit message here
+[33mfe662dc[m Added new feature
+[33m158cb5e[m user friendly
+[33m2b2ad3e[m Added charts in summary page
+[33m4757d09[m feat: add dynamic streak logic and health trivia bottom sheet and also the gap bar
+[33mb34360a[m made the meal options more interactive and adaptive
+[33m6a19576[m added function for sick bay.
+[33md320db2[m Integrated Mess Hall, Dashboard, and Profile screens
+[33m5cbd2fa[m Added blue gauge and buffer line
+[33m59023a1[m Fixed hydration bottle and added buffer slider
+[33m140d1be[m Description of what I changed
+[33mb00177f[m my changes
+[33m1bf48bb[m The ui ux enhanced a little
+[33m2f46710[m Added nav, created scanner and sick_bay.
+[33me248992[m Add features module and update app setup
+[33m8b00f9a[m chore: setup project structure, models, and mock services
