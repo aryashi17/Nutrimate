@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/food_item.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; 
-import 'package:firebase_auth/firebase_auth.dart';  
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CalcResult {
   final double grams;
@@ -9,42 +9,39 @@ class CalcResult {
   CalcResult(this.grams, this.calories);
 }
 
-class CalculatorEngine extends ChangeNotifier{
+class CalculatorEngine extends ChangeNotifier {
   double currentProtein = 0.0;
   double currentCarbs = 0.0;
-  DateTime lastResetDate = DateTime.now();
 
-  void checkAndResetForNewDay() {
+  double proteinGoal = 120.0;
+  double carbGoal = 250.0;
+
+  final _db = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+
+  String get _todayId {
     final now = DateTime.now();
-    // If today is a different day than the last time we logged food
-    if (now.day != lastResetDate.day || now.month != lastResetDate.month) {
-      currentProtein = 0.0;
-      currentCarbs = 0.0;
-      lastResetDate = now;
-      notifyListeners(); // Updates the home page button and charts
-    }
+    return "${now.year}-${now.month}-${now.day}";
   }
 
-  final double proteinGoal = 120.0;
-  final double carbGoal = 250.0;
-  // The logic: (Fill % * Section Max Capacity for that Food)
+  // ---------------------------
+  // FOOD CALCULATION (UNCHANGED)
+  // ---------------------------
   Future<CalcResult> calculate({
     required String sectionId,
-    required double fillFraction, // 0.0 to 1.0
+    required double fillFraction,
     required FoodItem food,
   }) async {
-    // MOCK LOGIC for Day 1
-    // In real version: use food.defaultSectionDensity[sectionId] * fillFraction
-    await Future.delayed(const Duration(milliseconds: 50)); // Fake network lag
-    
-    // Fallback if density not mapped
-    double maxGrams = food.defaultSectionDensity[sectionId] ?? 200.0; 
+    await Future.delayed(const Duration(milliseconds: 50));
+    double maxGrams = food.defaultSectionDensity[sectionId] ?? 200.0;
     double actualGrams = maxGrams * fillFraction;
     double actualCals = actualGrams * food.calPerGram;
-    
     return CalcResult(actualGrams, actualCals);
   }
-  // A library of nutrient values per full portion (1.0)
+
+  // ---------------------------
+  // FOOD LIBRARY (UNCHANGED)
+  // ---------------------------
   final Map<String, Map<String, double>> foodLibrary = {
     "Paneer": {"p": 25.0, "c": 10.0},
     "Rice": {"p": 5.0, "c": 45.0},
@@ -54,38 +51,51 @@ class CalculatorEngine extends ChangeNotifier{
     "Oats": {"p": 10.0, "c": 50.0},
     "Roti": {"p": 4.0, "c": 20.0},
   };
+
+  // ---------------------------
+  // LOAD DAILY DATA FROM FIRESTORE
+  // ---------------------------
   Future<void> fetchInitialData() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return;
+    final user = _auth.currentUser;
+    if (user == null) return;
 
-  final String dateId = DateTime.now().toIso8601String().split('T')[0];
-  
-  try {
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('logs')
-        .doc(dateId)
-        .get();
+    try {
+      // Load goals from profile
+      final profile = await _db.collection('users').doc(user.uid).get();
+      if (profile.exists) {
+        proteinGoal = (profile['dailyProteinTarget'] ?? proteinGoal).toDouble();
+        carbGoal = (profile['dailyCarbTarget'] ?? carbGoal).toDouble();
+      }
 
-    if (doc.exists) {
-      final data = doc.data()!;
-      // Update local variables with what's already in the cloud
-      currentProtein = (data['totalProtein'] ?? 0.0).toDouble();
-      currentCarbs = (data['totalCarbs'] ?? 0.0).toDouble();
+      // Load today's totals
+      final doc = await _db
+          .collection('users')
+          .doc(user.uid)
+          .collection('daily_stats')
+          .doc(_todayId)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data()!;
+        currentProtein = (data['protein'] ?? 0).toDouble();
+        currentCarbs = (data['carbs'] ?? 0).toDouble();
+      }
+
       notifyListeners();
+    } catch (e) {
+      debugPrint("CalculatorEngine: fetch error $e");
     }
-  } catch (e) {
-    debugPrint("Error fetching daily start: $e");
   }
-}
 
-  Future<void> addFood(String name, double portion) async { // Make this async
-    checkAndResetForNewDay();
-    
+  // ---------------------------
+  // ADD FOOD + SYNC TO FIRESTORE
+  // ---------------------------
+  Future<void> addFood(String name, double portion) async {
     final nutrients = foodLibrary.entries
-        .firstWhere((e) => name.contains(e.key), 
-        orElse: () => const MapEntry("Other", {"p": 10.0, "c": 30.0}))
+        .firstWhere(
+          (e) => name.contains(e.key),
+          orElse: () => const MapEntry("Other", {"p": 10.0, "c": 30.0}),
+        )
         .value;
 
     currentProtein += (nutrients["p"] ?? 0.0) * portion;
@@ -93,54 +103,54 @@ class CalculatorEngine extends ChangeNotifier{
 
     notifyListeners();
 
-    // --- NEW: SYNC TO FIREBASE FOR CHARTS ---
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        final String dateId = DateTime.now().toIso8601String().split('T')[0]; // e.g., "2023-10-27"
-        
-        print('CalculatorEngine: Syncing food data to Firebase for user ${user.uid}');
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('logs')
-            .doc(dateId) // Use date as ID to overwrite/update the same day's total
-            .set({
-          'totalProtein': currentProtein,
-          'totalCarbs': currentCarbs,
-          'timestamp': DateTime.now().toIso8601String(),
-          'dateLabel': "${DateTime.now().day} ${MonthLabels.short[DateTime.now().month]}",
-          'water': 0.0, // Should be updated via HydrationScreen
-        }, SetOptions(merge: true)); // Use merge to avoid overwriting water logs
-        print('CalculatorEngine: Successfully synced food data');
-      } else {
-        print('CalculatorEngine: No authenticated user, skipping Firebase sync');
-      }
+      final user = _auth.currentUser;
+      if (user == null) return;
+
+      await _db
+          .collection('users')
+          .doc(user.uid)
+          .collection('daily_stats')
+          .doc(_todayId)
+          .set({
+        'protein': currentProtein,
+        'carbs': currentCarbs,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
-      print('CalculatorEngine: Error syncing to Firebase: $e');
-      // Don't rethrow - we don't want food logging to fail because of sync issues
+      debugPrint("CalculatorEngine: sync error $e");
     }
   }
 
-  // Inside calculator_engine.dart
+  // ---------------------------
+  // HEALTH INSIGHTS LOGIC
+  // ---------------------------
+  String getEmergencyFix() {
+    final now = DateTime.now();
+    if (now.hour < 20) return "";
 
-String getEmergencyFix() {
-  final now = DateTime.now();
-  // Only suggest "Last Minute Fixes" after 8 PM (20:00)
-  if (now.hour < 20) return ""; 
-
-  if (currentProtein < (proteinGoal * 0.6)) {
-    return "🚨 LATE NIGHT PROTEIN FIX: Grab a Protein Shake or 3 Boiled Eggs at the kiosk now to prevent muscle fatigue tomorrow.";
-  } else if (currentCarbs < (carbGoal * 0.6)) {
-    return "🚨 ENERGY DEFICIT: Eat a Banana or a small bowl of Oats to avoid waking up with low blood sugar and 'brain fog'.";
+    if (currentProtein < (proteinGoal * 0.6)) {
+      return "🚨 LATE NIGHT PROTEIN FIX: Grab a Protein Shake or 3 Boiled Eggs at the kiosk now to prevent muscle fatigue tomorrow.";
+    } else if (currentCarbs < (carbGoal * 0.6)) {
+      return "🚨 ENERGY DEFICIT: Eat a Banana or a small bowl of Oats to avoid waking up with low blood sugar and 'brain fog'.";
+    }
+    return "✅ You're all set for tonight. Sleep well!";
   }
-  return "✅ You're all set for tonight. Sleep well!";
-}
 }
 
 class MonthLabels {
   static const Map<int, String> short = {
-    1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
-    7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec',
+    1: 'Jan',
+    2: 'Feb',
+    3: 'Mar',
+    4: 'Apr',
+    5: 'May',
+    6: 'Jun',
+    7: 'Jul',
+    8: 'Aug',
+    9: 'Sep',
+    10: 'Oct',
+    11: 'Nov',
+    12: 'Dec',
   };
 }
