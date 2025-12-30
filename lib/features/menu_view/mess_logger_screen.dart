@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,6 +39,10 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   // --- STATE VARIABLES ---
   String selectedMeal = "Lunch";
   String? _hoveredMeal;
+  bool _profileButtonHovered = false;
+  int? _hoveredPillActionIndex;
+  int? _hoveredFoodRowIndex;
+  bool _bottomActionHovered = false;
   Map<String, String> globalPlateOccupancy = {};
   Map<String, double> globalPlateFills = {};
   final TextEditingController _foodNameController = TextEditingController();
@@ -317,104 +322,91 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "LOG YOUR",
-                style: TextStyle(
-                  color: mutedText,
-                  fontSize: 10,
-                  letterSpacing: 4,
-                ),
-              ),
-              const Text(
-                "NUTRITION",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w200,
-                  letterSpacing: 2,
-                ),
-              ),
-            ],
-          ),
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfileScreen()),
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: accentMint, width: 1),
-              ),
-              child: const CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.black,
-                child: Icon(
-                  Icons.person_2_outlined,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
+          const Text(
+            "NUTRIMATE",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 3,
             ),
           ),
+          _buildProfileButton(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildProfileButton() {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _profileButtonHovered = true),
+      onExit: (_) => setState(() => _profileButtonHovered = false),
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ProfileScreen()),
+          );
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: accentMint, width: 1),
+            boxShadow: _profileButtonHovered
+                ? [
+                    BoxShadow(
+                      color: accentMint.withOpacity(0.3),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                : null,
+          ),
+          child: const CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.black,
+            child: Icon(
+              Icons.person_2_outlined,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
+        ),
       ),
     );
   }
 
   // --- UI: Horizontal Actions ---
   Widget _buildDynamicHorizontalActions() {
+    final actions = [
+      {'icon': Icons.local_hospital_outlined, 'label': 'Sick Bay', 'color': const Color(0xFFFF4B4B), 'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SickBayScreen()))},
+      {'icon': Icons.water_drop_outlined, 'label': 'Hydrate', 'color': const Color(0xFF00B0FF), 'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HydrationScreen()))},
+      {'icon': Icons.save_alt_rounded, 'label': 'Log Cloud', 'color': accentMint, 'action': () => _logPlateToFirebase()},
+      {'icon': Icons.add_circle_outline, 'label': 'Add', 'color': Colors.white, 'action': () => _showEditSheet()},
+      {'icon': Icons.calendar_month_outlined, 'label': 'Menu', 'color': Colors.orangeAccent, 'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WeeklyMenuScreen()))},
+    ];
+
     return Container(
       height: 70,
       margin: const EdgeInsets.only(top: 5),
-      child: ListView(
+      child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        children: [
-          _buildPillAction(
-            Icons.local_hospital_outlined,
-            "Sick Bay",
-            const Color(0xFFFF4B4B),
-            () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SickBayScreen()),
-            ),
-          ),
-          _buildPillAction(
-            Icons.water_drop_outlined,
-            "Hydrate",
-            const Color(0xFF00B0FF),
-            () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const HydrationScreen()),
-            ),
-          ),
-          _buildPillAction(
-            Icons.save_alt_rounded,
-            "Log Cloud",
-            accentMint,
-            () => _logPlateToFirebase(),
-          ), // Logs to Firebase
-          _buildPillAction(
-            Icons.add_circle_outline,
-            "Add",
-            Colors.white,
-            () => _showEditSheet(),
-          ),
-          _buildPillAction(
-            Icons.calendar_month_outlined,
-            "Menu",
-            Colors.orangeAccent,
-            () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const WeeklyMenuScreen()),
-            ),
-          ),
-        ],
+        itemCount: actions.length,
+        itemBuilder: (context, index) {
+          final action = actions[index];
+          return _buildPillAction(
+            action['icon'] as IconData,
+            action['label'] as String,
+            action['color'] as Color,
+            action['action'] as VoidCallback,
+            index,
+          );
+        },
       ),
     );
   }
@@ -424,30 +416,50 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
     String label,
     Color color,
     VoidCallback tap,
+    int index,
   ) {
-    return GestureDetector(
-      onTap: tap,
-      child: Container(
-        margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: glassLayer,
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w300,
+    bool isHovered = _hoveredPillActionIndex == index;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hoveredPillActionIndex = index),
+      onExit: (_) => setState(() => _hoveredPillActionIndex = null),
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          tap();
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.only(right: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: glassLayer,
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            boxShadow: isHovered
+                ? [
+                    BoxShadow(
+                      color: color.withOpacity(0.3),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w300,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -544,60 +556,76 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   }
 
   Widget _buildModernFoodRow(Map<String, dynamic> item, int index) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: glassLayer.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.03)),
-      ),
-      child: InkWell(
-        onTap: () => _handleFoodTap(item),
-        onLongPress: () => _showDeleteDialog(index),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Icon(item['icon'], color: accentMint, size: 18),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item['name'],
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                    ),
+    bool isHovered = _hoveredFoodRowIndex == index;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hoveredFoodRowIndex = index),
+      onExit: (_) => setState(() => _hoveredFoodRowIndex = null),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: glassLayer.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.03)),
+          boxShadow: isHovered
+              ? [
+                  BoxShadow(
+                    color: accentMint.withOpacity(0.3),
+                    blurRadius: 10,
+                    spreadRadius: 2,
                   ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: item['portion'],
-                      minHeight: 4,
-                      backgroundColor: Colors.white.withOpacity(0.05),
-                      valueColor: AlwaysStoppedAnimation(accentMint),
-                    ),
-                  ),
-                ],
+                ]
+              : null,
+        ),
+        child: InkWell(
+          onTap: () => _handleFoodTap(item),
+          onLongPress: () => _showDeleteDialog(index),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(item['icon'], color: accentMint, size: 18),
               ),
-            ),
-            const SizedBox(width: 20),
-            Text(
-              "${(item['portion'] * 100).toInt()}%",
-              style: TextStyle(color: mutedText, fontSize: 12),
-            ),
-            const Icon(Icons.chevron_right_rounded, color: Colors.white12),
-          ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item['name'],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        value: item['portion'],
+                        minHeight: 4,
+                        backgroundColor: Colors.white.withOpacity(0.05),
+                        valueColor: AlwaysStoppedAnimation(accentMint),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 20),
+              Text(
+                "${(item['portion'] * 100).toInt()}%",
+                style: TextStyle(color: mutedText, fontSize: 12),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: Colors.white12),
+            ],
+          ),
         ),
       ),
     );
@@ -607,47 +635,65 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   Widget _buildFloatingBottomAction() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            height: 60,
-            decoration: BoxDecoration(
-              color: accentMint.withOpacity(0.9),
-              boxShadow: [
-                BoxShadow(color: accentMint.withOpacity(0.3), blurRadius: 20),
-              ],
-            ),
-            child: InkWell(
-              onTap: () {
-                _logPlateToFirebase();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const HealthInsightsScreen(),
-                  ),
-                );
-              },
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "ANALYZE DIET GAP",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.5,
-                      fontSize: 13,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _bottomActionHovered = true),
+        onExit: (_) => setState(() => _bottomActionHovered = false),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 60,
+              decoration: BoxDecoration(
+                color: accentMint.withOpacity(0.9),
+                boxShadow: _bottomActionHovered
+                    ? [
+                        BoxShadow(
+                          color: accentMint.withOpacity(0.5),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: accentMint.withOpacity(0.3),
+                          blurRadius: 20,
+                        ),
+                      ],
+              ),
+              child: InkWell(
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  _logPlateToFirebase();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const HealthInsightsScreen(),
                     ),
-                  ),
-                  SizedBox(width: 10),
-                  Icon(
-                    Icons.arrow_forward_rounded,
-                    color: Colors.black,
-                    size: 18,
-                  ),
-                ],
+                  );
+                },
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "ANALYZE DIET GAP",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5,
+                        fontSize: 13,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      color: Colors.black,
+                      size: 18,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
