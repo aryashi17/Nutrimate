@@ -38,7 +38,8 @@ class HealthInsightsScreen extends StatelessWidget {
       style: const TextStyle(color: Color(0xFF7EE081), fontSize: 16),
     ),
             const SizedBox(height: 20),
-            
+            _buildMealChecklist(engine), 
+    const SizedBox(height: 20),
 
 // Inside the Column, before the charts:
 if (emergencyMessage.isNotEmpty)
@@ -50,7 +51,7 @@ if (emergencyMessage.isNotEmpty)
             // PROTEIN CHART
             MacroBar(
               label: "TOTAL DAILY PROTEIN",
-              current: engine.currentProtein,
+              current: engine.totalProtein,
               goal: engine.proteinGoal,
               barColor: const Color(0xFFAAF0D1), // Mint Green
             ),
@@ -70,7 +71,7 @@ if (emergencyMessage.isNotEmpty)
             // DYNAMIC RECOMMENDATIONS
             _buildInfoCard(
               "Campus Food Fix 🥪",
-              engine.currentProtein < (engine.proteinGoal * 0.5)
+              engine.totalProtein < (engine.proteinGoal * 0.5)
                   ? "You've missed half your protein! Try a double serving of Paneer or a protein shake at the kiosk."
                   : "Great progress! Grab a handful of nuts to stay on track.",
               const Color(0xFFAAF0D1),
@@ -81,10 +82,10 @@ if (emergencyMessage.isNotEmpty)
 // PROTEIN RISK ALERT
 _buildInfoCard(
   "Protein Deficiency Risks ⚠️",
-  engine.currentProtein < (engine.proteinGoal * 0.4)
+  engine.totalProtein < (engine.proteinGoal * 0.4)
       ? "Critical Low! Lack of protein can lead to hair loss, muscle wasting, and a weakened immune system."
       : "Your protein intake is protecting your muscle mass and skin health. Keep it up!",
-  engine.currentProtein < (engine.proteinGoal * 0.4) ? Colors.redAccent : Colors.greenAccent,
+  engine.totalProtein < (engine.proteinGoal * 0.4) ? Colors.redAccent : Colors.greenAccent,
 ),
 
 // CARBS/ENERGY RISK ALERT
@@ -102,17 +103,16 @@ _buildInfoCard(
   }
   
 Widget _buildMealChecklist(CalculatorEngine engine) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _mealStatus("Breakfast", engine.currentProtein > 0), 
-        _mealStatus("Lunch", engine.currentProtein > 30), // Example logic
-        _mealStatus("Snacks", false),
-        _mealStatus("Dinner", false),
-      ],
-    );
-  }
-
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: [
+      _mealStatus("Breakfast", engine.breakfastProtein > 0), 
+      _mealStatus("Lunch", engine.lunchProtein > 0),
+      _mealStatus("Snacks", engine.snackProtein > 0),
+      _mealStatus("Dinner", engine.dinnerProtein > 0),
+    ],
+  );
+}
   Widget _mealStatus(String label, bool isDone) {
     return Column(
       children: [
