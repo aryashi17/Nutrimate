@@ -127,58 +127,110 @@ class _SummaryScreenState extends State<SummaryScreen> with SingleTickerProvider
 
   // --- FIXED HISTORY BAR CHART ---
 Widget _buildHistoryBarChart(List<Map<String, dynamic>> logs) {
+
+  
+
   return Container(
     height: 220,
-    padding: const EdgeInsets.all(15),
+    padding: const EdgeInsets.fromLTRB(5, 15, 15, 5),
     decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(20)),
     child: BarChart(
       BarChartData(
+        maxY: 150, // Set this to your proteinGoal + a buffer
         borderData: FlBorderData(show: false),
-        gridData: const FlGridData(show: false),
+        gridData: FlGridData(show: true, drawVerticalLine: false, horizontalInterval: 30,
+          getDrawingHorizontalLine: (value) => FlLine(color: Colors.white10, strokeWidth: 1)),
+        titlesData: FlTitlesData(
+          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 35,
+              interval: 30, // ONLY SHOWS LABELS EVERY 30g TO PREVENT OVERLAP
+              getTitlesWidget: (value, meta) => Text("${value.toInt()}g", 
+                style: const TextStyle(color: Colors.white38, fontSize: 10)),
+            ),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                // Only show labels for first, middle, and last day to prevent overlap
+                if (value == 0 || value == (logs.length / 2).floor() || value == logs.length - 1) {
+                  return Text("Day ${value.toInt() + 1}", 
+                    style: const TextStyle(color: Colors.white38, fontSize: 9));
+                }
+                return const Text("");
+              },
+            ),
+          ),
+        ),
         barGroups: List.generate(logs.length, (index) {
-          // SAFE DATA FETCHING: Check if key exists and is not null
-          final rawProtein = logs[index]['totalProtein'];
-          final double proteinValue = (rawProtein is num) ? rawProtein.toDouble() : 0.0;
-
+          final double proteinValue = (logs[index]['totalProtein'] as num?)?.toDouble() ?? 0.0;
           return BarChartGroupData(
             x: index,
-            barRods: [
-              BarChartRodData(
-                toY: proteinValue, 
-                color: mint,
-                width: 12,
-                borderRadius: BorderRadius.circular(4),
-              )
-            ],
+            barRods: [BarChartRodData(toY: proteinValue, color: mint, width: logs.length > 7 ? 4 : 12)],
           );
         }),
       ),
     ),
   );
+
+  
 }
 
 // --- FIXED HISTORY LINE CHART ---
 Widget _buildHistoryLineChart(List<Map<String, dynamic>> logs) {
   return Container(
     height: 220,
-    padding: const EdgeInsets.all(15),
+    padding: const EdgeInsets.fromLTRB(5, 15, 20, 5),
     decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(20)),
     child: LineChart(
       LineChartData(
+        minY: 0,
+        maxY: 4000, // Adjust based on max expected water intake
         borderData: FlBorderData(show: false),
-        gridData: const FlGridData(show: false),
+        gridData: FlGridData(show: true, drawVerticalLine: false, horizontalInterval: 1000,
+          getDrawingHorizontalLine: (value) => FlLine(color: Colors.white10, strokeWidth: 1)),
+        titlesData: FlTitlesData(
+          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 40,
+              interval: 1000, // SHOW LABELS EVERY 1000ml (1L)
+              getTitlesWidget: (value, meta) {
+                // Convert 1000ml to 1L for cleaner UI
+                return Text("${(value / 1000).toStringAsFixed(1)}L", 
+                  style: const TextStyle(color: Colors.white38, fontSize: 10));
+              },
+            ),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                if (value == 0 || value == (logs.length / 2).floor() || value == logs.length - 1) {
+                  return Text("Day ${value.toInt() + 1}", 
+                    style: const TextStyle(color: Colors.white38, fontSize: 9));
+                }
+                return const Text("");
+              },
+            ),
+          ),
+        ),
         lineBarsData: [
           LineChartBarData(
             spots: List.generate(logs.length, (index) {
-              // SAFE DATA FETCHING
-              final rawWater = logs[index]['water'];
-              final double waterValue = (rawWater is num) ? rawWater.toDouble() : 0.0;
-              
+              final double waterValue = (logs[index]['water'] as num?)?.toDouble() ?? 0.0;
               return FlSpot(index.toDouble(), waterValue);
             }),
             isCurved: true,
             color: waterBlue,
             barWidth: 3,
+            dotData: const FlDotData(show: false), // Hide dots for cleaner look in monthly view
             belowBarData: BarAreaData(show: true, color: waterBlue.withOpacity(0.1)),
           ),
         ],
@@ -186,40 +238,75 @@ Widget _buildHistoryLineChart(List<Map<String, dynamic>> logs) {
     ),
   );
 }
-
   // --- REUSED UI COMPONENTS ---
 
   // --- IMPROVED DIET BAR CHART ---
 Widget _buildBarChart(CalculatorEngine engine) {
   return Container(
-    height: 220,
+    height: 250, // Increased height for better axis visibility
     padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
     decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(20)),
     child: BarChart(
       BarChartData(
+        maxY: engine.proteinGoal + 20, // Sets the top of the chart slightly above goal
         borderData: FlBorderData(show: false),
-        gridData: const FlGridData(show: false),
-        // Adding labels to the X-axis
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          getDrawingHorizontalLine: (value) => FlLine(color: Colors.white10, strokeWidth: 1),
+        ),
         titlesData: FlTitlesData(
           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          // --- Y-AXIS SCALE ---
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 35,
+              getTitlesWidget: (value, meta) => Text("${value.toInt()}g", 
+                style: const TextStyle(color: Colors.white38, fontSize: 10)),
+            ),
+          ),
+          // --- X-AXIS LABELS ---
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
-                const titles = ['BREAKFAST', 'LUNCH', 'SNACK', 'DINNER']; // Breakfast, Lunch, Snack, Dinner
-                return Text(titles[value.toInt()], 
-                  style: const TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold));
+                const titles = ['BREAKFAST', 'LUNCH', 'SNACK', 'DINNER'];
+                if (value.toInt() >= 0 && value.toInt() < titles.length) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(titles[value.toInt()], 
+                      style: const TextStyle(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.bold)),
+                  );
+                }
+                return const Text('');
               },
             ),
           ),
         ),
+        // --- ADDING A TARGET GOAL LINE ---
+        extraLinesData: ExtraLinesData(
+          horizontalLines: [
+            HorizontalLine(
+              y: engine.proteinGoal,
+              color: mint.withOpacity(0.5),
+              strokeWidth: 2,
+              dashArray: [5, 5],
+              label: HorizontalLineLabel(
+                show: true,
+                alignment: Alignment.topRight,
+                style: TextStyle(color: mint, fontSize: 10, fontWeight: FontWeight.bold),
+                labelResolver: (line) => 'GOAL ${engine.proteinGoal}g',
+              ),
+            ),
+          ],
+        ),
         barGroups: [
-          BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 8, color: mint, width: 16)]),
-          BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 12, color: mint, width: 16)]),
-          BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 5, color: mint, width: 16)]),
-          BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 10, color: mint, width: 16)]),
+          BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 35, color: mint, width: 18)]),
+          BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 45, color: mint, width: 18)]),
+          BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 15, color: mint, width: 18)]),
+          BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 25, color: mint, width: 18)]),
         ],
       ),
     ),
@@ -229,16 +316,26 @@ Widget _buildBarChart(CalculatorEngine engine) {
 // --- IMPROVED HYDRATION LINE CHART ---
 Widget _buildLineChart(CalculatorEngine engine) {
   return Container(
-    height: 220,
+    height: 250,
     padding: const EdgeInsets.fromLTRB(10, 20, 20, 10),
     decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(20)),
     child: LineChart(
       LineChartData(
-        gridData: const FlGridData(show: false),
+        minY: 0,
+        maxY: engine.goal.toDouble() + 500, // Dynamic max height based on user profile
+        gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (value) => FlLine(color: Colors.white10)),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 45,
+              getTitlesWidget: (value, meta) => Text("${value.toInt()}ml", 
+                style: const TextStyle(color: Colors.white38, fontSize: 10)),
+            ),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -250,9 +347,30 @@ Widget _buildLineChart(CalculatorEngine engine) {
             ),
           ),
         ),
+        // --- DYNAMIC WATER GOAL LINE ---
+        extraLinesData: ExtraLinesData(
+          horizontalLines: [
+            HorizontalLine(
+              y: engine.goal.toDouble(),
+              color: waterBlue.withOpacity(0.5),
+              strokeWidth: 2,
+              dashArray: [10, 5],
+              label: HorizontalLineLabel(
+                show: true,
+                labelResolver: (line) => 'TARGET',
+                style: TextStyle(color: waterBlue, fontWeight: FontWeight.bold, fontSize: 10),
+              ),
+            ),
+          ],
+        ),
         lineBarsData: [
           LineChartBarData(
-            spots: const [FlSpot(0, 1), FlSpot(1, 3), FlSpot(2, 2), FlSpot(3, 5)],
+            spots: [
+              FlSpot(0, 500), 
+              FlSpot(1, 1200), 
+              FlSpot(2, 1800), 
+              FlSpot(3, engine.totalDrank.toDouble())
+            ],
             isCurved: true,
             color: waterBlue,
             barWidth: 4,
