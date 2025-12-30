@@ -734,7 +734,7 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
           await Provider.of<CalculatorEngine>(
             context,
             listen: false,
-          ).addFood(item['name'], item['portion']);
+          ).addFood(item['name'], item['portion'], selectedMeal);
           await StreakService().updateStreak();
         } catch (e) {
           print('Error updating calculator or streak: $e');

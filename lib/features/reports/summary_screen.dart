@@ -127,16 +127,31 @@ class _SummaryScreenState extends State<SummaryScreen> with SingleTickerProvider
 
   // --- FIXED HISTORY BAR CHART ---
 Widget _buildHistoryBarChart(List<Map<String, dynamic>> logs) {
-
-  
-
   return Container(
     height: 220,
     padding: const EdgeInsets.fromLTRB(5, 15, 15, 5),
     decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(20)),
     child: BarChart(
       BarChartData(
-        maxY: 150, // Set this to your proteinGoal + a buffer
+        // ADD THIS: Tooltip logic for History
+        barTouchData: BarTouchData(
+          touchTooltipData: BarTouchTooltipData(
+            getTooltipColor: (_) => surface,
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              return BarTooltipItem(
+                'DAY ${group.x.toInt() + 1}\n',
+                const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                children: [
+                  TextSpan(
+                    text: '${rod.toY.round()}g',
+                    style: TextStyle(color: mint, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        maxY: 150, 
         borderData: FlBorderData(show: false),
         gridData: FlGridData(show: true, drawVerticalLine: false, horizontalInterval: 30,
           getDrawingHorizontalLine: (value) => FlLine(color: Colors.white10, strokeWidth: 1)),
@@ -147,7 +162,7 @@ Widget _buildHistoryBarChart(List<Map<String, dynamic>> logs) {
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 35,
-              interval: 30, // ONLY SHOWS LABELS EVERY 30g TO PREVENT OVERLAP
+              interval: 30, 
               getTitlesWidget: (value, meta) => Text("${value.toInt()}g", 
                 style: const TextStyle(color: Colors.white38, fontSize: 10)),
             ),
@@ -156,7 +171,6 @@ Widget _buildHistoryBarChart(List<Map<String, dynamic>> logs) {
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
-                // Only show labels for first, middle, and last day to prevent overlap
                 if (value == 0 || value == (logs.length / 2).floor() || value == logs.length - 1) {
                   return Text("Day ${value.toInt() + 1}", 
                     style: const TextStyle(color: Colors.white38, fontSize: 9));
@@ -176,8 +190,6 @@ Widget _buildHistoryBarChart(List<Map<String, dynamic>> logs) {
       ),
     ),
   );
-
-  
 }
 
 // --- FIXED HISTORY LINE CHART ---
@@ -248,6 +260,24 @@ Widget _buildBarChart(CalculatorEngine engine) {
     decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(20)),
     child: BarChart(
       BarChartData(
+        barTouchData: BarTouchData(
+          touchTooltipData: BarTouchTooltipData(
+            getTooltipColor: (_) => surface,
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              const titles = ['BREAKFAST', 'LUNCH', 'SNACK', 'DINNER'];
+              return BarTooltipItem(
+                '${titles[group.x.toInt()]}\n',
+                const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                children: [
+                  TextSpan(
+                    text: '${rod.toY.round()}g',
+                    style: TextStyle(color: mint, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
         maxY: engine.proteinGoal + 20, // Sets the top of the chart slightly above goal
         borderData: FlBorderData(show: false),
         gridData: FlGridData(
@@ -303,10 +333,10 @@ Widget _buildBarChart(CalculatorEngine engine) {
           ],
         ),
         barGroups: [
-          BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 35, color: mint, width: 18)]),
-          BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 45, color: mint, width: 18)]),
-          BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 15, color: mint, width: 18)]),
-          BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 25, color: mint, width: 18)]),
+          BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: engine.breakfastProtein, color: mint, width: 18)]),
+  BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: engine.lunchProtein, color: mint, width: 18)]),
+  BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: engine.snackProtein, color: mint, width: 18)]),
+  BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: engine.dinnerProtein, color: mint, width: 18)]),
         ],
       ),
     ),
@@ -366,9 +396,7 @@ Widget _buildLineChart(CalculatorEngine engine) {
         lineBarsData: [
           LineChartBarData(
             spots: [
-              FlSpot(0, 500), 
-              FlSpot(1, 1200), 
-              FlSpot(2, 1800), 
+             FlSpot(0, 0),
               FlSpot(3, engine.totalDrank.toDouble())
             ],
             isCurved: true,
@@ -393,14 +421,18 @@ Widget _buildLineChart(CalculatorEngine engine) {
   }
 
   Widget _buildQuickStats(CalculatorEngine engine) {
-    return Row(
-      children: [
-        _statTile("Avg Protein", "65g", Colors.orangeAccent),
-        const SizedBox(width: 15),
-        _statTile("Total Water", "2.4L", waterBlue),
-      ],
-    );
-  }
+  // Logic to calculate average from engine (example)
+  double avgProtein = engine.totalProtein / 1; // You can divide by actual days logged
+  double waterTarget = engine.goal / 1000; // Converts ml to Liters from user profile
+
+  return Row(
+    children: [
+      _statTile("Daily Protein Goal", "${engine.proteinGoal}g", Colors.orangeAccent),
+      const SizedBox(width: 15),
+      _statTile("Water Target", "${waterTarget.toStringAsFixed(1)}L", waterBlue),
+    ],
+  );
+}
 
   Widget _statTile(String label, String value, Color color) {
     return Expanded(

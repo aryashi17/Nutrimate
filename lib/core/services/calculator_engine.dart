@@ -52,10 +52,19 @@ double weight = 70.0; // Default
 
   notifyListeners(); 
 }
+
+// --- NEW MEAL-SPECIFIC DATA ---
+  double breakfastProtein = 0.0;
+  double lunchProtein = 0.0;
+  double snackProtein = 0.0;
+  double dinnerProtein = 0.0;
+
+  // Update this to be a getter that sums all meals
+  double get totalProtein => breakfastProtein + lunchProtein + snackProtein + dinnerProtein;
   // --- MACRO DATA ---
   double currentProtein = 0.0;
   double currentCarbs = 0.0;
-  final double proteinGoal = 120.0;
+double get proteinGoal => (weight * 1.8);
   final double carbGoal = 250.0;
   DateTime lastResetDate = DateTime.now();
 
@@ -84,7 +93,12 @@ double weight = 70.0; // Default
   void checkAndResetForNewDay() {
     final now = DateTime.now();
     if (now.day != lastResetDate.day || now.month != lastResetDate.month) {
-      currentProtein = 0.0;
+      // Clear meal specific data
+      breakfastProtein = 0.0;
+      lunchProtein = 0.0;
+      snackProtein = 0.0;
+      dinnerProtein = 0.0;
+      
       currentCarbs = 0.0;
       totalDrank = 0;
       bottlesCompleted = 0;
@@ -147,7 +161,7 @@ double weight = 70.0; // Default
     "Roti": {"p": 4.0, "c": 20.0},
   };
 
-  Future<void> addFood(String name, double portion) async {
+  Future<void> addFood(String name, double portion, String mealType) async {
     checkAndResetForNewDay();
     
     final nutrients = foodLibrary.entries
@@ -155,7 +169,14 @@ double weight = 70.0; // Default
         orElse: () => const MapEntry("Other", {"p": 10.0, "c": 30.0}))
         .value;
 
-    currentProtein += (nutrients["p"] ?? 0.0) * portion;
+    double proteinToAdd = (nutrients["p"] ?? 0.0) * portion;
+    
+    // Add to the specific meal category
+    if (mealType == 'Breakfast') breakfastProtein += proteinToAdd;
+    else if (mealType == 'Lunch') lunchProtein += proteinToAdd;
+    else if (mealType == 'Snacks') snackProtein += proteinToAdd;
+    else if (mealType == 'Dinner') dinnerProtein += proteinToAdd;
+
     currentCarbs += (nutrients["c"] ?? 0.0) * portion;
 
     notifyListeners();
@@ -173,7 +194,7 @@ double weight = 70.0; // Default
             .collection('logs')
             .doc(dateId)
             .set({
-          'totalProtein': currentProtein,
+          'totalProtein': totalProtein,
           'totalCarbs': currentCarbs,
           'dateLabel': "${DateTime.now().day} ${MonthLabels.short[DateTime.now().month]}",
         }, SetOptions(merge: true));
