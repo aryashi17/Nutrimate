@@ -64,6 +64,7 @@ double weight = 70.0; // Default
   // --- MACRO DATA ---
   double currentProtein = 0.0;
   double currentCarbs = 0.0;
+  double currentCalories = 0.0;
 double get proteinGoal => (weight * 1.8);
   final double carbGoal = 250.0;
   DateTime lastResetDate = DateTime.now();
@@ -99,7 +100,9 @@ double get proteinGoal => (weight * 1.8);
       snackProtein = 0.0;
       dinnerProtein = 0.0;
       
+      currentProtein = 0.0;
       currentCarbs = 0.0;
+      currentCalories = 0.0;
       totalDrank = 0;
       bottlesCompleted = 0;
       lastResetDate = now;
@@ -177,7 +180,9 @@ double get proteinGoal => (weight * 1.8);
     else if (mealType == 'Snacks') snackProtein += proteinToAdd;
     else if (mealType == 'Dinner') dinnerProtein += proteinToAdd;
 
+    currentProtein += proteinToAdd;
     currentCarbs += (nutrients["c"] ?? 0.0) * portion;
+    currentCalories += proteinToAdd * 4 + (nutrients["c"] ?? 0.0) * portion * 4;
 
     notifyListeners();
     syncFoodToFirebase();
@@ -196,6 +201,7 @@ double get proteinGoal => (weight * 1.8);
             .set({
           'totalProtein': totalProtein,
           'totalCarbs': currentCarbs,
+          'totalCalories': currentCalories,
           'dateLabel': "${DateTime.now().day} ${MonthLabels.short[DateTime.now().month]}",
         }, SetOptions(merge: true));
       }

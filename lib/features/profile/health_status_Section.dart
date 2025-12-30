@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/models/user_profile.dart';
+import '../../core/services/calculator_engine.dart';
 
 class HealthStatusSection extends StatelessWidget {
   final UserProfile? user; // This allows it to receive 'null' initially
@@ -8,6 +10,7 @@ class HealthStatusSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final engine = context.watch<CalculatorEngine>();
     // -----------------------------------------------------------
     // 1. HANDLE NULL CASE (Show "Setup Profile" card)
     // -----------------------------------------------------------
@@ -39,9 +42,9 @@ class HealthStatusSection extends StatelessWidget {
 
     // Now use 'safeUser' for all calculations below!
     
-    // Mock Data (Replace with real DB data later)
-    int eatenCals = 1250; 
-    int eatenProtein = 60; 
+    // Real Data from CalculatorEngine
+    int eatenCals = engine.currentCalories.toInt(); 
+    int eatenProtein = engine.currentProtein.toInt(); 
     
     // Prevent division by zero
     double proteinTarget = (safeUser.dailyProteinTarget > 0) 
