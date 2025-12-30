@@ -22,7 +22,7 @@ class PlateMapperScreen extends StatefulWidget {
 class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProviderStateMixin {
   double fillLevel = 0.0;
   String selectedSection = "Main";
-  String activeTemplate = "Thali"; // Thali, Balanced, or Single Bowl
+  String activeTemplate = "Thali"; 
   
   // Plate Memory System
   final Map<String, String> plateOccupancy = {}; // section -> foodName
@@ -44,7 +44,6 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
   // Handle section tap with selection/deselection logic
   Future<void> _handleSectionTap(String name, bool isOccupied) async {
     if (widget.foodName == null) {
-      // No food selected - just select the section
       setState(() => selectedSection = name);
       return;
     }
@@ -90,7 +89,7 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
     });
   }
 
-  // Show conflict resolution dialog
+  // Show conflict
   Future<String?> _showConflictDialog(String sectionName, String existingFood) async {
     return showDialog<String>(
       context: context,
@@ -163,25 +162,20 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
         builder: (context, constraints) {
           return Column(
             children: [
-              // Template selector - fixed height
               SizedBox(height: 60, child: _buildTemplateSelector()),
-              
-              // Food mapping text - conditional
               if (widget.foodName != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text("MAPPING: ${widget.foodName!.toUpperCase()}", 
                     style: TextStyle(color: accentMint, fontWeight: FontWeight.bold, letterSpacing: 1.2, fontSize: 12)),
                 ),
-              
-              // Visual plate - takes remaining space minus control panel
+            
               Expanded(
                 child: Center(
                   child: _buildVisualPlate(),
                 ),
               ),
               
-              // Control panel - fixed at bottom
               _buildControlPanel(),
             ],
           );
@@ -216,7 +210,6 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Outer Plate Shadow/Border
           Container(
             width: 300,
             height: 300,
@@ -230,7 +223,6 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
               border: Border.all(color: Colors.white10, width: 2),
             ),
           ),
-          // Interactive Sections
           if (activeTemplate == "Thali") _buildThaliLayout(),
           if (activeTemplate == "Balanced") _buildBalancedLayout(),
           if (activeTemplate == "Bowl") _buildBowlLayout(),
@@ -469,9 +461,7 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
     );
   }
 
-  // Get appropriate icon for food name
   IconData _getFoodIcon(String foodName) {
-    // This is a simple mapping - you can expand this based on your food database
     final foodIcons = {
       'Rice': Icons.rice_bowl_rounded,
       'Dal': Icons.soup_kitchen_rounded,

@@ -29,7 +29,6 @@ class MessLoggerScreen extends StatefulWidget {
 }
 
 class _MessLoggerScreenState extends State<MessLoggerScreen> {
-  // --- COLOR PALETTE (Ultra-Modern) ---
   final Color bgBlack = const Color(0xFF000000);
   final Color accentMint = const Color(0xFFB2FF59);
   final Color glassLayer = const Color(0xFF1A1A1A);
@@ -55,7 +54,7 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
   void initState() {
     super.initState();
     _determineInitialMeal();
-    _loadTodayMenu(); // ✅ THIS WAS MISSING
+    _loadTodayMenu(); 
   }
 
   Future<void> _loadTodayMenu() async {
@@ -178,7 +177,6 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
       backgroundColor: bgBlack,
       body: Stack(
         children: [
-          // Background Gradient Glow
           Positioned(
             top: -100,
             right: -50,
@@ -208,8 +206,6 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
                   children: [
                     _buildHeader(),
                     _buildDynamicHorizontalActions(),
-
-                    // 1. MERGED: Health Status and Hero Card side by side
                     if (userProfile != null)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
@@ -240,7 +236,6 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
     );
   }
 
-  // --- UI: Hero Card (Restyled) ---
   Widget _buildHeroCard() {
     final percent = currentMealCompletion;
     return Container(
@@ -315,7 +310,6 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
     );
   }
 
-  // --- UI: Header ---
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
@@ -389,7 +383,6 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
     );
   }
 
-  // --- UI: Horizontal Actions ---
   Widget _buildDynamicHorizontalActions() {
     final actions = [
       {'icon': Icons.local_hospital_outlined, 'label': 'Sick Bay', 'color': const Color(0xFFFF4B4B), 'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SickBayScreen()))},
@@ -474,7 +467,6 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
     );
   }
 
-  // --- UI: Meal Selector ---
   Widget _buildElegantMealSelector() {
     final meals = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
     return Padding(
@@ -534,7 +526,6 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
     );
   }
 
-  // --- UI: List ---
   Widget _buildSmoothList() {
     if (isMenuLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -640,7 +631,6 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
     );
   }
 
-  // --- UI: Footer ---
   Widget _buildFloatingBottomAction() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
@@ -738,7 +728,6 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
           }
         });
 
-        // Async updates
         try {
           await Provider.of<CalculatorEngine>(
             context,
