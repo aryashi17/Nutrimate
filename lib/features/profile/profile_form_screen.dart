@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/services/calculator_engine.dart';
 import '../../core/services/health_calculator.dart';
 import '../../core/enums/app_enums.dart';
-import '../../core/models/user_profile.dart'; // You likely need this too
 class ProfileFormScreen extends StatefulWidget {
   const ProfileFormScreen({super.key});
 
@@ -23,45 +24,67 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
   // Variable to show results (or null if not calculated yet)
   HealthGoals? _calculatedGoals;
 
-  void _calculateAndSave() {
-    // 1. INPUT VALIDATION: Check if fields are empty
-    if (_ageController.text.isEmpty ||
-        _heightController.text.isEmpty ||
-        _weightController.text.isEmpty ||
-        _selectedGender == null ||
-        _selectedActivity == null) {
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields to get your plan!'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // 2. PARSE DATA
-    final int age = int.parse(_ageController.text);
-    final double height = double.parse(_heightController.text);
-    final double weight = double.parse(_weightController.text);
-
-    // 3. CALL YOUR SERVICE (The file you created in services/)
-    final result = HealthCalculator.calculateGoals(
-      gender: _selectedGender,
-      age: age,
-      heightCm: height,
-      weightKg: weight,
-      activityLevel: _selectedActivity,
-      goalType: _selectedGoal,
-    );
-
-    // 4. UPDATE UI
-    setState(() {
-      _calculatedGoals = result;
-    });
+  // 1. You must add the 'async' keyword here to use 'await'
+void _calculateAndSave() async { 
+  // 1. INPUT VALIDATION
+  if (_ageController.text.isEmpty ||
+      _heightController.text.isEmpty ||
+      _weightController.text.isEmpty ||
+      _selectedGender == null ||
+      _selectedActivity == null) {
     
-    // Optional: Save 'result' to your database/SharedPreferences here
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please fill in all fields to get your plan!'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
   }
+
+  // 2. PARSE DATA
+  final int age = int.parse(_ageController.text);
+  final double height = double.parse(_heightController.text);
+  final double weight = double.parse(_weightController.text);
+  final String genderString = _selectedGender == Gender.male ? 'Male' : 'Female';
+
+  // 3. UPDATE THE ENGINE (Immediate UI update for other screens)
+  final engine = Provider.of<CalculatorEngine>(context, listen: false);
+  
+  engine.updateProfile(
+    newWeight: weight,
+    newHeight: height,
+    newGender: genderString,
+  );
+
+  // 4. PERFORM CALCULATIONS (Local display)
+  final result = HealthCalculator.calculateGoals(
+    gender: _selectedGender,
+    age: age,
+    heightCm: height,
+    weightKg: weight,
+    activityLevel: _selectedActivity,
+    goalType: _selectedGoal,
+  );
+
+  setState(() {
+    _calculatedGoals = result;
+  });
+
+  // 5. SAVE TO FIREBASE (Wait for it to finish)
+  // This is what ensures the data is in the cloud before you leave the page
+  await engine.saveProfileToFirebase();
+
+  // 6. GO BACK TO HYDRATION SCREEN
+  if (mounted) {
+   /* ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Plan Updated!'), backgroundColor: Colors.green),
+    );*/
+    
+    // This automatically takes you back to the Hydration screen
+    Navigator.pop(context); 
+  }
+}
 
   @override
   Widget build(BuildContext context) {

@@ -30,8 +30,7 @@ class _HydrationScreenState extends State<HydrationScreen> {
   @override
   Widget build(BuildContext context) {
     // This allows the screen to listen to the engine
-    final engine = Provider.of<CalculatorEngine>(context);
-
+final engine = context.watch<CalculatorEngine>();
     return Scaffold(
       appBar: AppBar(title: const Text("Hydration Tracker")),
       body: SingleChildScrollView(

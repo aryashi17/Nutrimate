@@ -12,9 +12,46 @@ class CalcResult {
 class CalculatorEngine extends ChangeNotifier {
   // --- HYDRATION DATA ---
   int totalDrank = 0;
-  int goal = 2000;
+  //int goal = 2000;
   int bottlesCompleted = 0;
 
+double weight = 70.0; // Default
+  String gender = 'Male';
+  double height = 170.0;
+
+  // Dynamic Goal Calculation
+  int get dynamicGoal {
+    // Basic formula: 35ml per kg
+    double baseGoal = weight * 35;
+    
+    // Adjust for gender (Standard guideline: Men usually need slightly more)
+    if (gender == 'Male') {
+      baseGoal += 500; 
+    }
+    
+    // Adjust for height (taller people require more hydration)
+    if (height > 180) {
+      baseGoal += 300;
+    }
+
+    return baseGoal.toInt();
+  }
+
+  // Replace your old goal variable with a getter
+  int get goal => dynamicGoal;
+
+  // Call this when you fetch user profile data from Firebase
+ void updateProfile({double? newWeight, double? newHeight, String? newGender}) {
+  // Use the correct variable names: weight and height
+  if (newWeight != null) weight = newWeight; 
+  if (newHeight != null) height = newHeight;
+  if (newGender != null) gender = newGender;
+
+  // You don't need _calculateWaterGoal() because you use a 'get' getter
+  // for 'goal', which calculates automatically when the UI rebuilds.
+
+  notifyListeners(); 
+}
   // --- MACRO DATA ---
   double currentProtein = 0.0;
   double currentCarbs = 0.0;
@@ -56,34 +93,31 @@ class CalculatorEngine extends ChangeNotifier {
     }
   }
 
-  // --- FIREBASE SYNC ---
-  Future<void> fetchInitialData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+ Future<void> fetchInitialData() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
 
-    final String dateId = DateTime.now().toIso8601String().split('T')[0];
+  try {
+    final profileDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('logs')
-          .doc(dateId)
-          .get();
-
-      if (doc.exists) {
-        final data = doc.data()!;
-        currentProtein = (data['totalProtein'] ?? 0.0).toDouble();
-        currentCarbs = (data['totalCarbs'] ?? 0.0).toDouble();
-        // Load saved water progress
-        totalDrank = (data['water'] ?? 0).toInt();
-        bottlesCompleted = (data['bottlesCompleted'] ?? 0).toInt();
-        notifyListeners();
-      }
-    } catch (e) {
-      debugPrint("Error fetching initial data: $e");
+    if (profileDoc.exists) {
+      final pData = profileDoc.data()!;
+      
+      // Update these lines to match your Firebase screenshot names
+      weight = double.tryParse(pData['weightKg'].toString()) ?? 70.0;
+      height = double.tryParse(pData['heightCm'].toString()) ?? 170.0;
+      
+      // Look for gender, if missing in Firebase it stays 'Male'
+      gender = pData['gender']?.toString() ?? 'Male';
+      
+      notifyListeners(); 
     }
+    // ... rest of your code for logs ...
+  } catch (e) {
+    debugPrint("Error: $e");
   }
+}
+
 
   Future<void> syncWaterToFirebase() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -148,6 +182,24 @@ class CalculatorEngine extends ChangeNotifier {
       debugPrint('Error syncing food: $e');
     }
   }
+
+  // Add this inside CalculatorEngine class
+Future<void> saveProfileToFirebase() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
+
+ try {
+      // UPDATED TO MATCH YOUR DATABASE NAMES
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'weightKg': weight,
+        'heightCm': height,
+        'gender': gender,
+      }, SetOptions(merge: true));
+      print("Profile successfully synced!");
+    } catch (e) {
+    debugPrint("Error saving profile: $e");
+  }
+}
 
   String getEmergencyFix() {
     final now = DateTime.now();
