@@ -65,7 +65,7 @@ class _MessLoggerScreenState extends State<MessLoggerScreen> {
       // Normalize Firestore data → UI format
       menu.forEach((meal, items) {
         for (final item in items) {
-          item['portion'] = item['defaultPortion'] ?? 0.5;
+          item['portion'] = 0.0;
           item['icon'] = Icons.restaurant_menu_rounded;
         }
       });
