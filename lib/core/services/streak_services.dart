@@ -77,7 +77,7 @@ class StreakService {
       }
     } catch (e) {
       print('StreakService: Error updating streak: $e');
-      // Don't rethrow - we don't want food logging to fail because of streak issues
+      
     }
   }
 }

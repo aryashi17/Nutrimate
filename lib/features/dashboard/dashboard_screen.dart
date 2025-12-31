@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-// Ensure these imports match your actual file structure
+
 import '../../core/models/user_profile.dart';
 import '../../core/models/meal_log_entry.dart'; 
 import '../profile/profile_screen.dart';
 
-// --- IMPORT THE SUMMARY SCREEN HERE ---
+
 import '../reports/summary_screen.dart'; 
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  // Helper to get the start of the day for filtering logs
+  
   DateTime get _startOfDay {
     final now = DateTime.now();
     return DateTime(now.year, now.month, now.day);
@@ -45,11 +45,11 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      // 1. First Stream: Get User GOALS (Profile)
+      
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
         builder: (context, userSnapshot) {
-          // Handle Profile Loading
+          
           if (userSnapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: mint));
           }
@@ -59,29 +59,30 @@ class HomeScreen extends StatelessWidget {
 
           UserProfile profile = UserProfile.fromMap(userSnapshot.data!.data() as Map<String, dynamic>);
 
-          // 2. Second Stream: Get Food Logs for TODAY
+          
+
           return StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('users')
                 .doc(user.uid)
-                .collection('food_logs') // Ensure this matches your Firestore collection name
+                .collection('food_logs') 
                 .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(_startOfDay))
                 .snapshots(),
             builder: (context, foodSnapshot) {
               
-              // Handle Logs Loading
+              
               if (!foodSnapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              // --- CALCULATION LOGIC START ---
-              // Initialize counters as doubles
+              
+              
               double currentCalories = 0;
               double currentProtein = 0;
               double currentCarbs = 0;
               double currentFat = 0;
 
-              // Loop through documents and sum them up
+              
               for (var doc in foodSnapshot.data!.docs) {
                 try {
                   var food = MealLogEntry.fromMap(doc.data() as Map<String, dynamic>, doc.id);
@@ -93,9 +94,9 @@ class HomeScreen extends StatelessWidget {
                   print("Error parsing food item: $e");
                 }
               }
-              // --- CALCULATION LOGIC END ---
+              
 
-              // Build the UI with the calculated data
+              
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -117,9 +118,9 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 25),
                     _buildWaterCard(profile.dailyWaterTarget, mint),
                     
-                    const SizedBox(height: 25), // Spacing before summary card
+                    const SizedBox(height: 25), 
 
-                    // --- NEW SUMMARY CARD ADDED HERE ---
+                    
                     GestureDetector(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => const SummaryScreen()));
@@ -128,7 +129,7 @@ class HomeScreen extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          // Gradient for a premium look
+                          
                           gradient: const LinearGradient(
                             colors: [Color(0xFF6A11CB), Color(0xFF2575FC)], 
                             begin: Alignment.topLeft,
@@ -178,7 +179,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // -----------------------------------
+                    
                   ],
                 ),
               );
@@ -189,13 +190,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // --- WIDGET HELPERS (Updated to accept doubles) ---
+  
 
   Widget _buildCalorieCard(UserProfile profile, double current, Color color) {
-    // Safely calculate progress
+   
     double progress = profile.dailyCalorieTarget > 0 ? current / profile.dailyCalorieTarget : 0;
     
-    // Calculate remaining
+    
     double remaining = profile.dailyCalorieTarget - current;
     if (remaining < 0) remaining = 0;
 

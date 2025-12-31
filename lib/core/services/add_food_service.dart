@@ -1,9 +1,8 @@
 import '../models/food_item.dart';
 
-// REMOVED "abstract" so you can use it directly
+
 class AddFoodService {
   
-  // 1. Manual Add Logic
   Future<FoodItem> addManualFood({
     required String name,
     required double caloriesPer100g,
@@ -20,7 +19,7 @@ class AddFoodService {
     );
   }
 
-  // 2. Scan Logic (Mock)
+ 
   Future<FoodItem> scanFood() async {
     // Simulate scanning delay
     await Future.delayed(const Duration(seconds: 2));

@@ -2,7 +2,7 @@ class UserModel {
   final String uid;
   final String email;
   final String name;
-  final int heightCm;
+  final double heightCm;
   final double weightKg;
   final int bottleSizeMl; 
   final String? currentIllness;
@@ -11,9 +11,9 @@ class UserModel {
     required this.uid,
     required this.email,
     required this.name,
-    this.heightCm = 170,
-    this.weightKg = 60.0,
-    this.bottleSizeMl = 1000,
+    this.heightCm = 0,
+    this.weightKg = 0.0,
+    this.bottleSizeMl = 500,
     this.currentIllness,
   });
 
@@ -34,9 +34,9 @@ class UserModel {
       uid: map['uid'] ?? '',
       email: map['email'] ?? '',
       name: map['name'] ?? 'Student',
-      heightCm: map['heightCm'] ?? 170,
-      weightKg: (map['weightKg'] ?? 60.0).toDouble(),
-      bottleSizeMl: map['bottleSizeMl'] ?? 1000,
+      heightCm: map['heightCm'] ?? 0,
+      weightKg: (map['weightKg'] ?? 0),
+      bottleSizeMl: map['bottleSizeMl'] ?? 500,
       currentIllness: map['currentIllness'],
     );
   }

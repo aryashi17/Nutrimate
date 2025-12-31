@@ -4,13 +4,14 @@ import '../../core/models/user_profile.dart';
 import '../../core/services/calculator_engine.dart';
 
 class HealthStatusSection extends StatelessWidget {
-  final UserProfile? user; // This allows it to receive 'null' initially
+  final UserProfile? user; // Allows null for "Not set up" state
 
   const HealthStatusSection({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
     final engine = context.watch<CalculatorEngine>();
+
     // -----------------------------------------------------------
     // 1. HANDLE NULL CASE (Show "Setup Profile" card)
     // -----------------------------------------------------------
@@ -26,23 +27,22 @@ class HealthStatusSection extends StatelessWidget {
           children: [
             Icon(Icons.warning_amber_rounded, color: Colors.amber),
             SizedBox(width: 12),
-            Text("Profile not set up. Tap profile to start!", 
-                style: TextStyle(color: Colors.white70)),
+            Expanded(
+              child: Text(
+                "Profile not set up. Tap profile to start!", 
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
           ],
         ),
       );
     }
 
-    // -----------------------------------------------------------
-    // 2. CREATE 'SAFE' USER (The Fix for your Red Errors)
-    // -----------------------------------------------------------
-    // Since we passed the check above, we know 'user' is not null here.
-    // We create 'safeUser' using '!' to tell Dart "Trust me, this exists".
-    final safeUser = user!; 
+    final UserProfile safeUser = user!; 
 
-    // Now use 'safeUser' for all calculations below!
-    
-    // Real Data from CalculatorEngine
+    // -----------------------------------------------------------
+    // 3. CALCULATE STATS
+    // -----------------------------------------------------------
     int eatenCals = engine.currentCalories.toInt(); 
     int eatenProtein = engine.currentProtein.toInt(); 
     
@@ -55,6 +55,9 @@ class HealthStatusSection extends StatelessWidget {
     
     final Color mint = const Color(0xFF7EE081);
 
+    // -----------------------------------------------------------
+    // 4. RENDER UI
+    // -----------------------------------------------------------
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -99,8 +102,8 @@ class HealthStatusSection extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: mint.withOpacity(0.2), 
                           borderRadius: BorderRadius.circular(4)),
-                      // Use 'safeUser' here safely
-                      child: Text("BMI ${safeUser.bmi}", 
+                      // Now 'safeUser' works because we defined it above
+                      child: Text("BMI ${safeUser.bmi.toStringAsFixed(1)}", 
                           style: TextStyle(color: mint, fontSize: 10, fontWeight: FontWeight.bold)),
                     ),
                   ],
@@ -111,7 +114,6 @@ class HealthStatusSection extends StatelessWidget {
                     children: [
                       TextSpan(text: "$eatenCals", 
                           style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                      // Use 'safeUser' here safely
                       TextSpan(text: " / ${safeUser.dailyCalorieTarget} kcal", 
                           style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
                     ],

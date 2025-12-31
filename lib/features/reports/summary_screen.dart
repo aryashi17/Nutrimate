@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../core/services/calculator_engine.dart';
-import '../../core/services/history_service.dart'; // Ensure this exists
+import '../../core/services/history_service.dart'; 
 
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});
@@ -133,7 +133,7 @@ Widget _buildHistoryBarChart(List<Map<String, dynamic>> logs) {
     decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(20)),
     child: BarChart(
       BarChartData(
-        // ADD THIS: Tooltip logic for History
+       
         barTouchData: BarTouchData(
           touchTooltipData: BarTouchTooltipData(
             getTooltipColor: (_) => surface,
@@ -250,7 +250,7 @@ Widget _buildHistoryLineChart(List<Map<String, dynamic>> logs) {
     ),
   );
 }
-  // --- REUSED UI COMPONENTS ---
+ 
 
   // --- IMPROVED DIET BAR CHART ---
 Widget _buildBarChart(CalculatorEngine engine) {

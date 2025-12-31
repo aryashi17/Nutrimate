@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/food_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; 
 import 'package:firebase_auth/firebase_auth.dart';  
 
@@ -12,64 +11,86 @@ class CalcResult {
 class CalculatorEngine extends ChangeNotifier {
   // --- HYDRATION DATA ---
   int totalDrank = 0;
-  //int goal = 2000;
   int bottlesCompleted = 0;
 
-double weight = 70.0; // Default
-  String gender = 'Male';
-  double height = 170.0;
+  // --- USER PROFILE DATA ---
+  double weight = 0.0; 
+  double height = 0.0;
+  int age = 0;          // <--- ADDED: Age Field
+  String gender = 'Male'; // Default to Male to ensure math works
 
-  // Dynamic Goal Calculation
+  // --- 1. DYNAMIC HYDRATION GOAL ---
   int get dynamicGoal {
     // Basic formula: 35ml per kg
     double baseGoal = weight * 35;
     
-    // Adjust for gender (Standard guideline: Men usually need slightly more)
+    // Adjust for gender 
     if (gender == 'Male') {
       baseGoal += 500; 
     }
     
-    // Adjust for height (taller people require more hydration)
+    // Adjust for height 
     if (height > 180) {
       baseGoal += 300;
     }
 
+    // Adjust for Age (Older adults often need reminders, but physiological need decreases slightly)
+    // We will keep it simple for now, but you can add logic here.
+    
     return baseGoal.toInt();
   }
 
-  // Replace your old goal variable with a getter
+  // Getter for UI access
   int get goal => dynamicGoal;
 
-  // Call this when you fetch user profile data from Firebase
- void updateProfile({double? newWeight, double? newHeight, String? newGender}) {
-  // Use the correct variable names: weight and height
-  if (newWeight != null) weight = newWeight; 
-  if (newHeight != null) height = newHeight;
-  if (newGender != null) gender = newGender;
+  // --- 2. DYNAMIC CALORIE & MACRO GOALS (Uses Age) ---
+  
+  // Calculate BMR (Mifflin-St Jeor Equation)
+  double get bmr {
+    if (weight == 0 || height == 0 || age == 0) return 2000.0; // Default if no data
 
-  // You don't need _calculateWaterGoal() because you use a 'get' getter
-  // for 'goal', which calculates automatically when the UI rebuilds.
+    // Formula: (10 × weight) + (6.25 × height) - (5 × age) + s
+    double base = (10 * weight) + (6.25 * height) - (5 * age);
+    
+    if (gender == 'Male') {
+      return base + 5;
+    } else {
+      return base - 161;
+    }
+  }
 
-  notifyListeners(); 
-}
+  // Daily Maintenance Calories (Assuming Sedentary/Student lifestyle x 1.2)
+  double get dailyCalorieGoal => bmr * 1.2;
 
-// --- NEW MEAL-SPECIFIC DATA ---
+  // Macro Goals based on Calorie Goal
+  double get proteinGoal => (weight * 1.8); // 1.8g per kg bodyweight
+  double get carbGoal => (dailyCalorieGoal * 0.50) / 4; // 50% of diet from carbs, divide by 4 cal/g
+  double get fatGoal => (dailyCalorieGoal * 0.25) / 9; // 25% of diet from fats, divide by 9 cal/g
+
+  // --- 3. CURRENT PROGRESS VARIABLES ---
   double breakfastProtein = 0.0;
   double lunchProtein = 0.0;
   double snackProtein = 0.0;
   double dinnerProtein = 0.0;
 
-  // Update this to be a getter that sums all meals
   double get totalProtein => breakfastProtein + lunchProtein + snackProtein + dinnerProtein;
-  // --- MACRO DATA ---
-  double currentProtein = 0.0;
+  double get currentProtein => totalProtein;
   double currentCarbs = 0.0;
   double currentCalories = 0.0;
-double get proteinGoal => (weight * 1.8);
-  final double carbGoal = 250.0;
+  
   DateTime lastResetDate = DateTime.now();
 
-  // --- LOGIC: ADD WATER ---
+  // --- 4. UPDATE LOCAL DATA ---
+  void updateProfile({double? newWeight, double? newHeight, String? newGender, int? newAge}) {
+    if (newWeight != null) weight = newWeight; 
+    if (newHeight != null) height = newHeight;
+    if (newGender != null) gender = newGender;
+    if (newAge != null) age = newAge; // <--- ADDED: Handle Age update
+
+    notifyListeners(); 
+  }
+
+  // --- 5. LOGIC: ADD WATER ---
   void addWater(int amount) {
     checkAndResetForNewDay();
     totalDrank += amount;
@@ -90,7 +111,7 @@ double get proteinGoal => (weight * 1.8);
     syncWaterToFirebase();
   }
 
-  // --- LOGIC: RESET FOR NEW DAY ---
+  // --- 6. LOGIC: RESET FOR NEW DAY ---
   void checkAndResetForNewDay() {
     final now = DateTime.now();
     if (now.day != lastResetDate.day || now.month != lastResetDate.month) {
@@ -100,7 +121,6 @@ double get proteinGoal => (weight * 1.8);
       snackProtein = 0.0;
       dinnerProtein = 0.0;
       
-      currentProtein = 0.0;
       currentCarbs = 0.0;
       currentCalories = 0.0;
       totalDrank = 0;
@@ -110,32 +130,53 @@ double get proteinGoal => (weight * 1.8);
     }
   }
 
- Future<void> fetchInitialData() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return;
+  // --- 7. FIREBASE: FETCH INITIAL DATA ---
+  Future<void> fetchInitialData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-  try {
-    final profileDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-    
-    if (profileDoc.exists) {
-      final pData = profileDoc.data()!;
+    try {
+      final profileDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       
-      // Update these lines to match your Firebase screenshot names
-      weight = double.tryParse(pData['weightKg'].toString()) ?? 70.0;
-      height = double.tryParse(pData['heightCm'].toString()) ?? 170.0;
-      
-      // Look for gender, if missing in Firebase it stays 'Male'
-      gender = pData['gender']?.toString() ?? 'Male';
-      
-      notifyListeners(); 
+      if (profileDoc.exists) {
+        final pData = profileDoc.data()!;
+        
+        weight = double.tryParse(pData['weightKg'].toString()) ?? 0.0;
+        height = double.tryParse(pData['heightCm'].toString()) ?? 0.0;
+        
+        // Fix: Ensure Gender falls back to Male if missing
+        gender = pData['gender']?.toString() ?? 'Male';
+        
+        // <--- ADDED: Fetch Age
+        age = int.tryParse(pData['age'].toString()) ?? 0;
+        
+        notifyListeners(); 
+      }
+    } catch (e) {
+      debugPrint("Error fetching data: $e");
     }
-    // ... rest of your code for logs ...
-  } catch (e) {
-    debugPrint("Error: $e");
   }
-}
 
+  // --- 8. FIREBASE: SAVE PROFILE ---
+  Future<void> saveProfileToFirebase() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'weightKg': weight,
+        'heightCm': height,
+        'gender': gender,
+        'age': age, // <--- ADDED: Save Age to DB
+      }, SetOptions(merge: true));
+      
+      print("Profile successfully synced!");
+    } catch (e) {
+      debugPrint("Error saving profile: $e");
+    }
+  }
+
+  // --- 9. FIREBASE: SYNC WATER ---
   Future<void> syncWaterToFirebase() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -153,7 +194,7 @@ double get proteinGoal => (weight * 1.8);
     }, SetOptions(merge: true));
   }
 
-  // --- FOOD LOGGING LOGIC ---
+  // --- 10. FOOD LOGGING LOGIC ---
   final Map<String, Map<String, double>> foodLibrary = {
     "Paneer": {"p": 25.0, "c": 10.0},
     "Rice": {"p": 5.0, "c": 45.0},
@@ -174,13 +215,11 @@ double get proteinGoal => (weight * 1.8);
 
     double proteinToAdd = (nutrients["p"] ?? 0.0) * portion;
     
-    // Add to the specific meal category
     if (mealType == 'Breakfast') breakfastProtein += proteinToAdd;
     else if (mealType == 'Lunch') lunchProtein += proteinToAdd;
     else if (mealType == 'Snacks') snackProtein += proteinToAdd;
     else if (mealType == 'Dinner') dinnerProtein += proteinToAdd;
 
-    currentProtein += proteinToAdd;
     currentCarbs += (nutrients["c"] ?? 0.0) * portion;
     currentCalories += proteinToAdd * 4 + (nutrients["c"] ?? 0.0) * portion * 4;
 
@@ -210,28 +249,11 @@ double get proteinGoal => (weight * 1.8);
     }
   }
 
-  // Add this inside CalculatorEngine class
-Future<void> saveProfileToFirebase() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return;
-
- try {
-      // UPDATED TO MATCH YOUR DATABASE NAMES
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'weightKg': weight,
-        'heightCm': height,
-        'gender': gender,
-      }, SetOptions(merge: true));
-      print("Profile successfully synced!");
-    } catch (e) {
-    debugPrint("Error saving profile: $e");
-  }
-}
-
+  // --- 11. EMERGENCY FIX HELPER ---
   String getEmergencyFix() {
     final now = DateTime.now();
     if (now.hour < 20) return ""; 
-    if (currentProtein < (proteinGoal * 0.6)) return "🚨 LATE NIGHT PROTEIN FIX: Grab a Protein Shake!";
+    if (totalProtein < (proteinGoal * 0.6)) return "🚨 LATE NIGHT PROTEIN FIX: Grab a Protein Shake!";
     if (currentCarbs < (carbGoal * 0.6)) return "🚨 ENERGY DEFICIT: Eat a Banana!";
     return "✅ You're all set for tonight.";
   }

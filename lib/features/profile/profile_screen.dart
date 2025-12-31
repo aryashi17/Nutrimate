@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart'; 
 import '../../core/services/health_calculator.dart';
+import '../../core/services/calculator_engine.dart';
 import '../../core/models/user_profile.dart';
 import '../auth/login_screen.dart';
 
@@ -25,8 +27,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String _gender = 'Male';
   String _activityLevel = 'Moderate';
-  String _goal = 'Maintain'; // NEW State Variable
+  String _goal = 'Maintain';
 
+  // These lists must match exactly what is in the dropdown logic below
   final List<String> _goals = ['Weight Loss', 'Maintain', 'Muscle Gain'];
   final List<String> _activities = ['Sedentary', 'Lightly Active', 'Moderate', 'Very Active', 'Super Active'];
 
@@ -50,19 +53,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _heightCtrl.text = profile.heightCm.toString();
               _weightCtrl.text = profile.weightKg.toString();
               _gender = profile.gender;
-              _activityLevel = profile.activityLevel;
-              _goal = profile.goal; // Load Goal
+              
+              // --- CRASH FIX: DATA SANITIZATION ---
+              // If the database has "Light" but our list has "Lightly Active", the app crashes.
+              // This logic forces a fallback to "Moderate" if the value isn't found.
+              
+              if (_activities.contains(profile.activityLevel)) {
+                _activityLevel = profile.activityLevel;
+              } else {
+                // Determine a safe default if the DB value is invalid/old
+                _activityLevel = 'Moderate'; 
+                // Optional: print debug log
+                // debugPrint("Warning: Activity level '${profile.activityLevel}' not found in list. Defaulting to Moderate.");
+              }
+
+              if (_goals.contains(profile.goal)) {
+                 _goal = profile.goal;
+              } else {
+                 _goal = 'Maintain';
+              }
+         
+
               _isEditing = false;
               _isLoading = false;
             });
+            
+            // Sync Engine so Dashboard gets the data immediately
+             _syncEngine(profile.weightKg, profile.heightCm, profile.gender);
           }
         } else {
+          // No profile found, user must create one
           setState(() => _isLoading = false);
         }
       } catch (e) {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  // Helper to update the Provider Engine
+  void _syncEngine(double weight, double height, String gender) {
+     if (!mounted) return; // Safety check
+     final engine = Provider.of<CalculatorEngine>(context, listen: false);
+     engine.updateProfile(
+       newWeight: weight, 
+       newHeight: height, 
+       newGender: gender
+     );
   }
 
   void _saveProfile() async {
@@ -97,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         heightCm: height,
         weightKg: weight,
         activityLevel: _activityLevel,
-        goal: _goal, // Save Goal
+        goal: _goal,
         bmi: bmi,
         dailyCalorieTarget: targetCalories,
         dailyProteinTarget: macros['protein']!,
@@ -106,7 +143,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         dailyWaterTarget: water,
       );
 
+      // Save to Firebase
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set(profile.toMap());
+
+      // Update the Engine Provider
+      if (mounted) {
+        _syncEngine(weight, height, _gender);
+      }
 
       if (mounted) {
         setState(() {
@@ -114,7 +157,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _isEditing = false;
           _isLoading = false;
         });
+        
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile Updated!")));
+        
+        // If we came from the "Complete Setup" button, go back to dashboard
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
       }
     } catch (e) {
       if (mounted) {

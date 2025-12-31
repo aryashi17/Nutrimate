@@ -6,12 +6,10 @@ class UserProfile {
   final double weightKg;
   final String activityLevel;
   
-  // --- NEW FIELDS (These are what you are missing!) ---
   final String goal; 
   final int dailyCarbTarget;
   final int dailyFatTarget;
-  // ---------------------------------------------------
-
+  
   final double bmi;
   final int dailyCalorieTarget;
   final int dailyProteinTarget;
@@ -26,14 +24,14 @@ class UserProfile {
     required this.activityLevel,
     this.goal = 'Maintain',        // Default value
     this.bmi = 0.0,
-    this.dailyCalorieTarget = 2000,
-    this.dailyProteinTarget = 100,
-    this.dailyCarbTarget = 250,    // Default value
-    this.dailyFatTarget = 60,      // Default value
-    this.dailyWaterTarget = 3000,
+    this.dailyCalorieTarget = 0,
+    this.dailyProteinTarget = 0,
+    this.dailyCarbTarget = 0,    // Default value
+    this.dailyFatTarget = 0,      // Default value
+    this.dailyWaterTarget = 0,
   });
 
-  // Convert to Map for Firestore
+
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -52,22 +50,22 @@ class UserProfile {
     };
   }
 
-  // Create from Map (Reading from Firestore)
+  
   factory UserProfile.fromMap(Map<String, dynamic> map) {
     return UserProfile(
       uid: map['uid'] ?? '',
       gender: map['gender'] ?? 'Male',
-      age: map['age'] ?? 20,
-      heightCm: (map['heightCm'] ?? 170).toDouble(),
-      weightKg: (map['weightKg'] ?? 70).toDouble(),
+      age: map['age'] ?? 0,
+      heightCm: (map['heightCm'] ?? 0),
+      weightKg: (map['weightKg'] ?? 0),
       activityLevel: map['activityLevel'] ?? 'Moderate',
       goal: map['goal'] ?? 'Maintain', // Loading the goal
       bmi: (map['bmi'] ?? 0.0).toDouble(),
-      dailyCalorieTarget: map['dailyCalorieTarget'] ?? 2000,
-      dailyProteinTarget: map['dailyProteinTarget'] ?? 100,
-      dailyCarbTarget: map['dailyCarbTarget'] ?? 250, // Loading carbs
-      dailyFatTarget: map['dailyFatTarget'] ?? 60,    // Loading fats
-      dailyWaterTarget: map['dailyWaterTarget'] ?? 3000,
+      dailyCalorieTarget: map['dailyCalorieTarget'] ?? 0,
+      dailyProteinTarget: map['dailyProteinTarget'] ?? 0,
+      dailyCarbTarget: map['dailyCarbTarget'] ?? 0, // Loading carbs
+      dailyFatTarget: map['dailyFatTarget'] ?? 0,    // Loading fats
+      dailyWaterTarget: map['dailyWaterTarget'] ?? 0,
     );
   }
 }

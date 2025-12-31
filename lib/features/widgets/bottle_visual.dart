@@ -52,9 +52,7 @@ Container(
         height: 220 * (fillLevel > 1.0 ? 1.0 : fillLevel),
         decoration: BoxDecoration(
           color: Colors.blue.withOpacity(0.7),
-          // REMOVE borderRadius from here entirely! 
-          // If the water is a rectangle, the bottle's Clip.antiAlias 
-          // will curve the bottom corners for you automatically.
+        
         ),
       ),
       

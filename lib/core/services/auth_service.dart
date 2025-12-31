@@ -7,10 +7,9 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // Listen to auth state
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  // Get current user ID
+
   String? get currentUserId => _auth.currentUser?.uid;
 
   // --- GOOGLE SIGN IN (WEB VERSION) ---

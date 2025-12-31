@@ -45,7 +45,7 @@ class GoalsDashboard extends StatelessWidget {
       appBar: AppBar(title: const Text("Your Daily Plan")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        // Added SingleChildScrollView to prevent overflow errors since we added more content
+        
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -159,9 +159,7 @@ class GoalsDashboard extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                   // Navigate to the form we created earlier
-                   // Make sure you import ProfileFormScreen before uncommenting this
-                   // Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileFormScreen()));
+                   
                 },
                 child: const Text("Complete Profile Now"),
               ),
