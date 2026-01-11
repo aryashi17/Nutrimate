@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import 'core/theme/theme_provider.dart';
+import 'package:flutter/services.dart';
 
 // --- SERVICE & CORE IMPORTS ---
 import 'firebase_options.dart';
@@ -16,6 +18,7 @@ import 'features/menu_view/mess_logger_screen.dart';
 import '../features/dashboard/dashboard_screen.dart'; 
 import 'features/reports/summary_screen.dart';
 import 'features/profile/profile_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -27,6 +30,7 @@ void main() async {
       providers: [
         // Using ChangeNotifierProvider to allow UI updates from CalculatorEngine
         ChangeNotifierProvider(create: (_) => CalculatorEngine()),
+        ChangeNotifierProvider(create: (_) => ThemeModeProvider()),
       ],
       child: const MyApp(),
     ),
@@ -34,19 +38,38 @@ void main() async {
 }
 
 // 1. THE APP ROOT
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'NutriMate',
+//       theme: AppTheme.darkTheme,
+//       debugShowCheckedModeBanner: false,
+//       home: const AuthWrapper(),
+//     );
+//   }
+// }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = context.watch<ThemeModeProvider>().mode;
+
     return MaterialApp(
       title: 'NutriMate',
-      theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
+      themeMode: themeMode,
+      theme: AppTheme.lightTheme,   // 👈 add this
+      darkTheme: AppTheme.darkTheme,
       home: const AuthWrapper(),
     );
   }
 }
+
 
 // 2. THE GATEKEEPER (AuthWrapper)
 class AuthWrapper extends StatelessWidget {
@@ -160,13 +183,43 @@ class NeonWelcomeScreen extends StatelessWidget {
                 }
               ),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.lightbulb_outline, color: Colors.amberAccent),
-                onPressed: () => _showTrivia(context),
-              ),
-              const SizedBox(width: 10),
-            ],
+            // actions: [
+            //   IconButton(
+            //     icon: const Icon(Icons.lightbulb_outline, color: Colors.amberAccent),
+            //     onPressed: () => _showTrivia(context),
+            //   ),
+            //   const SizedBox(width: 10),
+            // ],
+  actions: [
+  // 🌗 THEME TOGGLE BUTTON (ADD THIS)
+  IconButton(
+    tooltip: 'Toggle Theme',
+    icon: AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (child, anim) =>
+          RotationTransition(turns: anim, child: child),
+      child: Icon(
+        context.watch<ThemeModeProvider>().isDark
+            ? Icons.light_mode_rounded
+            : Icons.dark_mode_rounded,
+        key: ValueKey(context.watch<ThemeModeProvider>().isDark),
+        color: AppTheme.neonPurple,
+      ),
+    ),
+    onPressed: () {
+      HapticFeedback.lightImpact();
+      context.read<ThemeModeProvider>().toggle();
+    },
+  ),
+
+  // 💡 EXISTING TRIVIA BUTTON (UNCHANGED)
+  IconButton(
+    icon: const Icon(Icons.lightbulb_outline, color: Colors.amberAccent),
+    onPressed: () => _showTrivia(context),
+  ),
+  const SizedBox(width: 10),
+],
+
           ),
           body: Center(
             child: SingleChildScrollView(

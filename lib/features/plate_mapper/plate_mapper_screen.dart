@@ -3,12 +3,14 @@ import 'package:flutter/services.dart';
 
 class PlateMapperScreen extends StatefulWidget {
   final String? foodName;
+  final String mealType;
   final double initialFill;
   final Map<String, String> existingOccupancy;
   final Map<String, double> existingFills;
 
   const PlateMapperScreen({
     super.key,
+    required this.mealType,
     this.foodName,
     this.initialFill = 0.0,
     required this.existingOccupancy,
@@ -79,6 +81,25 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
       setState(() => selectedSection = name);
     }
   }
+@override
+void didUpdateWidget(covariant PlateMapperScreen oldWidget) {
+  super.didUpdateWidget(oldWidget);
+
+  if (oldWidget.mealType != widget.mealType) {
+    setState(() {
+      plateOccupancy
+        ..clear()
+        ..addAll(widget.existingOccupancy);
+
+      sectionFillLevels
+        ..clear()
+        ..addAll(widget.existingFills);
+
+      selectedSection = '';
+      fillLevel = widget.initialFill;
+    });
+  }
+}
 
   // Place food in a section
   void _placeFoodInSection(String sectionName, double fill) {
@@ -88,6 +109,27 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
       selectedSection = ''; // Clear selection after placing
     });
   }
+  void _placeAndConfirm(String sectionName, double fill) {
+  // Place food first
+  _placeFoodInSection(sectionName, fill);
+
+  // Build changes list (EXACTLY same logic as old confirm button)
+  final changes = <Map<String, dynamic>>[];
+
+  plateOccupancy.forEach((section, food) {
+    if (food != 'Empty') {
+      changes.add({
+        'section': section,
+        'food': food,
+        'fill': sectionFillLevels[section] ?? 0.0,
+      });
+    }
+  });
+
+  // Return to previous screen
+  Navigator.pop(context, changes);
+}
+
 
   // Show conflict
   Future<String?> _showConflictDialog(String sectionName, String existingFood) async {
@@ -132,18 +174,31 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
   }
 
   // Get all sections for current template
+  // List<String> _getAllSectionsForTemplate(String template) {
+  //   switch (template) {
+  //     case 'Thali':
+  //       return ['Bowl 1', 'Bowl 2', 'Bowl 3', 'Rice/Roti'];
+  //     case 'Balanced':
+  //       return ['Veggies (50%)', 'Protein', 'Carbs'];
+  //     case 'Bowl':
+  //       return ['Main Bowl'];
+  //     default:
+  //       return [];
+  //   }
+  // }
   List<String> _getAllSectionsForTemplate(String template) {
-    switch (template) {
-      case 'Thali':
-        return ['Bowl 1', 'Bowl 2', 'Bowl 3', 'Rice/Roti'];
-      case 'Balanced':
-        return ['Veggies (50%)', 'Protein', 'Carbs'];
-      case 'Bowl':
-        return ['Main Bowl'];
-      default:
-        return [];
-    }
+  switch (template) {
+    case 'Thali':
+      return ['Bowl 1', 'Bowl 2', 'Bowl 3', 'Sabzi', 'Rice/Roti'];
+    case 'Balanced':
+      return ['Veggies (50%)', 'Protein', 'Carbs'];
+    case 'Bowl':
+      return ['Main Bowl'];
+    default:
+      return [];
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -205,31 +260,195 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
     );
   }
 
+  // Widget _buildVisualPlate() {
+  //   return Center(
+  //     child: Stack(
+  //       alignment: Alignment.center,
+  //       children: [
+  //         Container(
+  //           width: 300,
+  //           height: 300,
+  //           decoration: BoxDecoration(
+  //             shape: BoxShape.circle,
+  //             color: surface,
+  //             boxShadow: [
+  //               BoxShadow(color: accentMint.withOpacity(0.05), blurRadius: 40, spreadRadius: 10),
+  //               BoxShadow(color: Colors.black, blurRadius: 20, offset: const Offset(0, 10)),
+  //             ],
+  //             border: Border.all(color: Colors.white10, width: 2),
+  //           ),
+  //         ),
+  //         if (activeTemplate == "Thali") _buildThaliLayout(),
+  //         if (activeTemplate == "Balanced") _buildBalancedLayout(),
+  //         if (activeTemplate == "Bowl") _buildBowlLayout(),
+  //       ],
+  //     ),
+  //   );
+  // }
   Widget _buildVisualPlate() {
-    return Center(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 300,
-            height: 300,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: surface,
-              boxShadow: [
-                BoxShadow(color: accentMint.withOpacity(0.05), blurRadius: 40, spreadRadius: 10),
-                BoxShadow(color: Colors.black, blurRadius: 20, offset: const Offset(0, 10)),
-              ],
-              border: Border.all(color: Colors.white10, width: 2),
-            ),
+  return Center(
+    child: Container(
+      width: 320,
+      height: 260,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
-          if (activeTemplate == "Thali") _buildThaliLayout(),
-          if (activeTemplate == "Balanced") _buildBalancedLayout(),
-          if (activeTemplate == "Bowl") _buildBowlLayout(),
         ],
       ),
-    );
-  }
+      child: Column(
+        children: [
+          // Top 3 bowls
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _steelBowl(name: "Bowl 1"),
+              _steelBowl(name: "Bowl 2"),
+              _steelBowl(name: "Bowl 3"),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Bottom compartments
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: _steelTrayBox(name: "Sabzi")),
+                const SizedBox(width: 10),
+                Expanded(flex: 2, child: _steelTrayBox(name: "Rice/Roti")),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+Widget _steelBowl({required String name}) {
+  bool isSel = selectedSection == name;
+  bool isOccupied = plateOccupancy.containsKey(name) && plateOccupancy[name] != 'Empty';
+  double currentFill = sectionFillLevels[name] ?? 0.0;
+
+  return GestureDetector(
+    onTap: () => _handleSectionTap(name, isOccupied),
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      width: 70,
+      height: 70,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: [
+            Colors.grey.shade200,
+            Colors.grey.shade400,
+          ],
+        ),
+        border: Border.all(
+          color: isSel ? accentMint : Colors.grey.shade500,
+          width: isSel ? 3 : 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: _sectionContent(name, currentFill, 22),
+    ),
+  );
+}
+Widget _steelTrayBox({required String name}) {
+  bool isSel = selectedSection == name;
+  bool isOccupied = plateOccupancy.containsKey(name) && plateOccupancy[name] != 'Empty';
+  double currentFill = sectionFillLevels[name] ?? 0.0;
+
+  return GestureDetector(
+    onTap: () => _handleSectionTap(name, isOccupied),
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.grey.shade200,
+            Colors.grey.shade400,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isSel ? accentMint : Colors.grey.shade500,
+          width: isSel ? 3 : 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: _sectionContent(name, currentFill, 28),
+    ),
+  );
+}
+Widget _sectionContent(String name, double fill, double iconSize) {
+  bool isOccupied = plateOccupancy.containsKey(name) && plateOccupancy[name] != 'Empty';
+
+  return Stack(
+    alignment: Alignment.center,
+    children: [
+      AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: isOccupied
+            ? Icon(
+                _getFoodIcon(plateOccupancy[name]!),
+                key: ValueKey(plateOccupancy[name]),
+                size: iconSize,
+                color: Colors.black87,
+              )
+            : Text(
+                name,
+                key: ValueKey("empty_$name"),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+      ),
+      if (isOccupied && fill > 0)
+        Positioned(
+          top: 4,
+          right: 4,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(
+              color: bgDark.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              '${(fill * 100).toInt()}%',
+              style: TextStyle(
+                color: accentMint,
+                fontSize: 8,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+    ],
+  );
+}
+
 
   Widget _buildThaliLayout() {
     return SizedBox(
@@ -524,50 +743,27 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
           const SizedBox(height: 8),
           if (selectedSection.isNotEmpty && widget.foodName != null) ...[
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: accentMint, 
-                foregroundColor: Colors.black,
-                minimumSize: const Size(double.infinity, 44),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              onPressed: () {
-                _placeFoodInSection(selectedSection, fillLevel);
-              },
-              child: Text("PLACE ${widget.foodName!.toUpperCase()}", 
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            ),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: accentMint, 
+    foregroundColor: Colors.black,
+    minimumSize: const Size(double.infinity, 44),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    padding: const EdgeInsets.symmetric(vertical: 12),
+  ),
+  onPressed: () {
+    HapticFeedback.heavyImpact();
+    _placeAndConfirm(selectedSection, fillLevel);
+  },
+  child: Text(
+    "PLACE & CONFIRM ${widget.foodName!.toUpperCase()}",
+    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+  ),
+),
+
             const SizedBox(height: 8),
           ],
           const Text("Tap sections to select, tap again to deselect", style: TextStyle(color: Colors.white60, fontSize: 10)),
           const SizedBox(height: 12),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: surface, 
-              foregroundColor: accentMint,
-              minimumSize: const Size(double.infinity, 44),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: accentMint, width: 2),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-            onPressed: () {
-              // Return list of all plate changes
-              final changes = <Map<String, dynamic>>[];
-              plateOccupancy.forEach((section, food) {
-                if (food != 'Empty') {
-                  changes.add({
-                    'section': section,
-                    'food': food,
-                    'fill': sectionFillLevels[section] ?? 0.0,
-                  });
-                }
-              });
-              Navigator.pop(context, changes);
-            },
-            child: const Text("CONFIRM PLATE", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-          ),
         ],
       ),
     );

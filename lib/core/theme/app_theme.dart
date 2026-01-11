@@ -56,4 +56,63 @@ class AppTheme {
       bodyMedium: TextStyle(color: Colors.white70),
     ),
   );
+
+    // --- LIGHT THEME ---
+  static final ThemeData lightTheme = ThemeData(
+    brightness: Brightness.light,
+    useMaterial3: true,
+    fontFamily: 'Inter',
+
+    scaffoldBackgroundColor: Colors.white,
+    primaryColor: neonPurple,
+
+    colorScheme: ColorScheme.light(
+      primary: neonPurple,
+      secondary: neonBlue,
+      surface: Colors.grey.shade100,
+      background: Colors.white,
+      onPrimary: Colors.white,
+      onSecondary: Colors.black,
+    ),
+
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      foregroundColor: Colors.black,
+    ),
+
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: neonPurple,
+        foregroundColor: Colors.white,
+        elevation: 6,
+        shadowColor: neonPurple.withOpacity(0.35),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      ),
+    ),
+
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: neonPurple,
+        side: BorderSide(color: neonPurple.withOpacity(0.7), width: 2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+      ),
+    ),
+
+    textTheme: const TextTheme(
+      headlineLarge: TextStyle(
+        fontWeight: FontWeight.w900,
+        color: Colors.black,
+      ),
+      bodyMedium: TextStyle(
+        color: Colors.black87,
+      ),
+    ),
+  );
+
 }
