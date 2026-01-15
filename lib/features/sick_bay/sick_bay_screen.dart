@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/services/sick_bay_service.dart';
 import '../../core/models/sick_bay_result.dart';
+import 'medicines/medicines_screen.dart';
 
 class SickBayScreen extends StatefulWidget {
   const SickBayScreen({super.key});
@@ -51,6 +52,8 @@ class _SickBayScreenState extends State<SickBayScreen> {
             children: [
               _buildIntro(),
               const SizedBox(height: 24),
+              _buildMedicinesButton(),
+              const SizedBox(height: 24,),
               _buildIssueInput(),
               const SizedBox(height: 24),
               _buildAilmentSelector(),
@@ -341,6 +344,39 @@ class _SickBayScreenState extends State<SickBayScreen> {
     );
   }
 
+  Widget _buildMedicinesButton() {
+  return SizedBox(
+    width: double.infinity,
+    height: 52,
+    child: OutlinedButton.icon(
+      style: OutlinedButton.styleFrom(
+        side: const BorderSide(color: Color(0xFFAAF0D1)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+      icon: const Icon(Icons.medication_outlined, color: Color(0xFFAAF0D1)),
+      label: const Text(
+        "Medicines",
+        style: TextStyle(
+          color: Color(0xFFAAF0D1),
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const MedicinesScreen(),
+          ),
+        );
+      },
+    ),
+  );
+}
+
+
   Widget _resultCard({
     required String title,
     required IconData icon,
@@ -359,10 +395,7 @@ class _SickBayScreenState extends State<SickBayScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                icon,
-                color: accentColor,
-              ),
+              Icon(icon, color: accentColor),
               const SizedBox(width: 8),
               Text(
                 title,
