@@ -1,0 +1,171 @@
+[1mdiff --git a/lib/features/hydration/hydration_screen.dart b/lib/features/hydration/hydration_screen.dart[m
+[1mindex e1f1fce..85427a8 100644[m
+[1m--- a/lib/features/hydration/hydration_screen.dart[m
+[1m+++ b/lib/features/hydration/hydration_screen.dart[m
+[36m@@ -1,147 +1,3 @@[m
+[31m-// import 'package:flutter/material.dart';[m
+[31m-// import 'package:provider/provider.dart';[m
+[31m-// import 'package:nutrimate_app/core/services/calculator_engine.dart';[m
+[31m-// import '../widgets/water_button.dart'; [m
+[31m-// import '../widgets/bottle_visual.dart';[m
+[31m-[m
+[31m-// class HydrationScreen extends StatefulWidget {[m
+[31m-//   const HydrationScreen({super.key});[m
+[31m-[m
+[31m-//   @override[m
+[31m-//   State<HydrationScreen> createState() => _HydrationScreenState();[m
+[31m-// }[m
+[31m-[m
+[31m-// class _HydrationScreenState extends State<HydrationScreen> {[m
+[31m-[m
+[31m-//   // Logic for status messages[m
+[31m-//   String _getFunnyStatus(int total, int goal, int completed) {[m
+[31m-//     if (completed > 0) {[m
+[31m-//       if (completed >= 3) return "Champion Level: Basically a Fish 🐟";[m
+[31m-//       return "On to bottle number ${completed + 1}! You're a pro! 🚀";[m
+[31m-//     }[m
+[31m-[m
+[31m-//     double progress = total / goal;[m
+[31m-//     if (progress >= 0.75) return "Look at you, Hydration Hero! 🦸";[m
+[31m-//     if (progress >= 0.50) return "Halfway! Your skin is glowing (probably) ✨";[m
+[31m-//     if (progress >= 0.25) return "Emotional Support Water Level: LOW ⚠️";[m
+[31m-//     return "Your kidneys are sending a search party 🔍";[m
+[31m-//   }[m
+[31m-[m
+[31m-//   @override[m
+[31m-//   Widget build(BuildContext context) {[m
+[31m-//     // This allows the screen to listen to the engine[m
+[31m-// final engine = context.watch<CalculatorEngine>();[m
+[31m-//     return Scaffold([m
+[31m-//       appBar: AppBar(title: const Text("Hydration Tracker")),[m
+[31m-//       body: SingleChildScrollView([m
+[31m-//         child: Column([m
+[31m-//           mainAxisAlignment: MainAxisAlignment.center,[m
+[31m-//           children: [[m
+[31m-//             const SizedBox(height: 20),[m
+[31m-//             // Progress Gauge[m
+[31m-//             Stack([m
+[31m-//               alignment: Alignment.center,[m
+[31m-//               children: [[m
+[31m-//                 SizedBox([m
+[31m-//                   width: 180, [m
+[31m-//                   height: 180,[m
+[31m-//                   child: CircularProgressIndicator([m
+[31m-//                     value: (engine.totalDrank / engine.goal).clamp(0.0, 1.0),[m
+[31m-//                     strokeWidth: 10,[m
+[31m-//                     backgroundColor: Colors.white10,[m
+[31m-//                     valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4FC3F7)),[m
+[31m-//                   ),[m
+[31m-//                 ),[m
+[31m-//                 Text([m
+[31m-//                   "${((engine.totalDrank / engine.goal) * 100).toInt()}%",[m
+[31m-//                   style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Color(0xFFAAF0D1)),[m
+[31m-//                 ),[m
+[31m-//               ],[m
+[31m-//             ),[m
+[31m-            [m
+[31m-//             Padding([m
+[31m-//               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),[m
+[31m-//               child: Text([m
+[31m-//                 _getFunnyStatus(engine.totalDrank, engine.goal, engine.bottlesCompleted),[m
+[31m-//                 textAlign: TextAlign.center,[m
+[31m-//                 style: const TextStyle(fontSize: 18, color: Colors.white, fontStyle: FontStyle.italic),[m
+[31m-//               ),[m
+[31m-//             ),[m
+[31m-[m
+[31m-//             Text([m
+[31m-//               "${engine.totalDrank} / ${engine.goal} ml",[m
+[31m-//               style: const TextStyle(fontSize: 20, color: Colors.white54),[m
+[31m-//             ),[m
+[31m-[m
+[31m-//             const SizedBox(height: 30),[m
+[31m-[m
+[31m-//             Row([m
+[31m-//               mainAxisAlignment: MainAxisAlignment.center,[m
+[31m-//               crossAxisAlignment: CrossAxisAlignment.center,[m
+[31m-//               children: [[m
+[31m-//                 const SizedBox(width: 50), [m
+[31m-//                 BottleVisual(fillLevel: engine.totalDrank / engine.goal),[m
+[31m-//                 // Reward Icons[m
+[31m-//                 Padding([m
+[31m-//                   padding: const EdgeInsets.only(left: 20),[m
+[31m-//                   child: Column([m
+[31m-//                     mainAxisSize: MainAxisSize.min,[m
+[31m-//                     children: List.generate([m
+[31m-//                       engine.bottlesCompleted,[m
+[31m-//                       (index) => const Padding([m
+[31m-//                         padding: EdgeInsets.symmetric(vertical: 4.0),[m
+[31m-//                         child: Icon(Icons.local_drink_rounded, color: Color(0xFFAAF0D1), size: 28),[m
+[31m-//                       ),[m
+[31m-//                     ),[m
+[31m-//                   ),[m
+[31m-//                 ),[m
+[31m-//               ],[m
+[31m-//             ),[m
+[31m-[m
+[31m-//             const SizedBox(height: 30),[m
+[31m-            [m
+[31m-//             // Call the engine's addWater method[m
+[31m-//             WaterButtons(onAddWater: (amount) => engine.addWater(amount)),[m
+[31m-            [m
+[31m-//             const SizedBox(height: 20),[m
+[31m-            [m
+[31m-//             ElevatedButton([m
+[31m-//               onPressed: () => engine.resetHydration(),[m
+[31m-//               child: const Text("Reset Day"),[m
+[31m-//             ),[m
+[31m-            [m
+[31m-//             // Manual Slider using engine data[m
+[31m-//             Container([m
+[31m-//               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),[m
+[31m-//               padding: const EdgeInsets.all(15),[m
+[31m-//               decoration: BoxDecoration([m
+[31m-//                 color: Colors.white.withOpacity(0.05),[m
+[31m-//                 borderRadius: BorderRadius.circular(15),[m
+[31m-//               ),[m
+[31m-//               child: Column([m
+[31m-//                 children: [[m
+[31m-//                   const Text("Manual Adjustment", style: TextStyle(color: Color(0xFFAAF0D1))),[m
+[31m-//                   Slider([m
+[31m-//                     value: engine.totalDrank.toDouble().clamp(0, engine.goal.toDouble()),[m
+[31m-//                     min: 0,[m
+[31m-//                     max: engine.goal.toDouble(),[m
+[31m-//                     activeColor: const Color(0xFFAAF0D1),[m
+[31m-//                     onChanged: (newValue) {[m
+[31m-//                       // Directly update engine[m
+[31m-//                       engine.totalDrank = newValue.toInt();[m
+[31m-//                       engine.notifyListeners(); [m
+[31m-//                     },[m
+[31m-//                   ),[m
+[31m-//                 ],[m
+[31m-//               ),[m
+[31m-//             ),[m
+[31m-//           ],[m
+[31m-//         ),[m
+[31m-//       ),[m
+[31m-//     );[m
+[31m-//   }[m
+[31m-// }[m
+[31m-[m
+ import 'dart:math';[m
+ import 'dart:ui';[m
+ import 'package:flutter/material.dart';[m
+[36m@@ -163,15 +19,25 @@[m [mclass _HydrationScreenState extends State<HydrationScreen>[m
+   bool _showConfetti = false;[m
+ [m
+   @override[m
+[31m-  void initState() {[m
+[31m-    super.initState();[m
+[31m-    _pulseController = AnimationController([m
+[31m-      vsync: this,[m
+[31m-      duration: const Duration(milliseconds: 900),[m
+[31m-      lowerBound: 0.95,[m
+[31m-      upperBound: 1.05,[m
+[31m-    )..repeat(reverse: true);[m
+[31m-  }[m
+[32m+[m[32mvoid initState() {[m
+[32m+[m[32m  super.initState();[m
+[32m+[m[32m  WidgetsBinding.instance.addPostFrameCallback((_) {[m
+[32m+[m[32m    final engine = Provider.of<CalculatorEngine>(context, listen: false);[m
+[32m+[m[41m    [m
+[32m+[m[32m    // 💡 Add this condition: Only show if th
