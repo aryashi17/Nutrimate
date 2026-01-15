@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../core/models/medicine.dart';
 import '../../../core/services/medicine_service.dart';
 import 'add_medicine_screen.dart';
+import '../../../core/services/medicine_log_service.dart';
+import '../../../core/models/medicine_log.dart';
+
 
 class MedicinesScreen extends StatefulWidget {
   const MedicinesScreen({super.key});
@@ -23,10 +26,72 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
     _loadMedicines();
   }
 
+  String _todayKey() {
+  final now = DateTime.now();
+  return "${now.year}-"
+      "${now.month.toString().padLeft(2, '0')}-"
+      "${now.day.toString().padLeft(2, '0')}";
+}
+
+Future<void> _generateTodayLogs(List<Medicine> medicines) async {
+  final logService = MedicineLogService();
+  final today = DateTime.now();
+  final dateKey = _todayKey();
+
+  for (final med in medicines) {
+    // Skip inactive medicines
+    if (!med.isActive) continue;
+
+    // Skip expired medicines
+    if (med.endDate != null && med.endDate!.isBefore(today)) continue;
+
+    for (final time in med.times) {
+      final parts = time.split(':');
+
+      final scheduledTime = DateTime(
+        today.year,
+        today.month,
+        today.day,
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+      );
+
+      final log = MedicineLog(
+        id: '',
+        medicineId: med.id,
+        medicineName: med.name,
+        scheduledTime: scheduledTime,
+        takenTime: null,
+        status: MedicineLogStatus.missed, // default
+        dateKey: dateKey,
+      );
+
+      await logService.createLog(log);
+    }
+  }
+}
+
+Future<void> _ensureTodayLogs(List<Medicine> medicines) async {
+  final logService = MedicineLogService();
+  final dateKey = _todayKey();
+
+  final exists = await logService.logsExistForDate(dateKey);
+  if (exists) return;
+
+  await _generateTodayLogs(medicines);
+}
+
+
+
+
   // ─────────────────────────────────────
 
   Future<void> _loadMedicines() async {
     final meds = await _service.getMedicines();
+
+    // 🔥 STEP 13 ACTUALLY RUNS HERE
+    await _ensureTodayLogs(meds);
+
     setState(() {
       _medicines
         ..clear()
@@ -34,6 +99,7 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
       _loading = false;
     });
   }
+
 
   // ─────────────────────────────────────
 
