@@ -6,7 +6,7 @@ import 'add_medicine_screen.dart';
 import '../../../core/services/medicine_log_service.dart';
 import '../../../core/models/medicine_log.dart';
 import 'today_medicines_screen.dart';
-
+import 'medicine_history_screen.dart';
 
 class MedicinesScreen extends StatefulWidget {
   const MedicinesScreen({super.key});
@@ -28,83 +28,78 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
   }
 
   String _todayKey() {
-  final now = DateTime.now();
-  return "${now.year}-"
-      "${now.month.toString().padLeft(2, '0')}-"
-      "${now.day.toString().padLeft(2, '0')}";
-}
+    final now = DateTime.now();
+    return "${now.year}-"
+        "${now.month.toString().padLeft(2, '0')}-"
+        "${now.day.toString().padLeft(2, '0')}";
+  }
 
-Future<void> _generateTodayLogs(List<Medicine> medicines) async {
-  final logService = MedicineLogService();
-  final today = DateTime.now();
-  final dateKey = _todayKey();
+  Future<void> _generateTodayLogs(List<Medicine> medicines) async {
+    final logService = MedicineLogService();
+    final today = DateTime.now();
+    final dateKey = _todayKey();
 
-  for (final med in medicines) {
-    if (!med.isActive) continue;
-    if (med.endDate != null && med.endDate!.isBefore(today)) continue;
+    for (final med in medicines) {
+      if (!med.isActive) continue;
+      if (med.endDate != null && med.endDate!.isBefore(today)) continue;
 
-    for (final time in med.times) {
-      final parts = time.split(':');
+      for (final time in med.times) {
+        final parts = time.split(':');
 
-      final scheduledTime = DateTime(
-        today.year,
-        today.month,
-        today.day,
-        int.parse(parts[0]),
-        int.parse(parts[1]),
-        0, 0, 0,
-      );
+        final scheduledTime = DateTime(
+          today.year,
+          today.month,
+          today.day,
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+          0,
+          0,
+          0,
+        );
 
-      final scheduledKey =
-        "${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}";
+        final scheduledKey =
+            "${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}";
 
+        // 🔥 CHECK PER DOSE
+        final exists = await logService.logExists(
+          medicineId: med.id,
+          dateKey: dateKey,
+          scheduledKey: scheduledKey,
+        );
 
+        if (exists) continue;
 
-      // 🔥 CHECK PER DOSE
-      final exists = await logService.logExists(
-        medicineId: med.id,
-        dateKey: dateKey,
-        scheduledKey: scheduledKey,
-      );
+        final log = MedicineLog(
+          id: '',
+          medicineId: med.id,
+          medicineName: med.name,
+          scheduledTime: scheduledTime,
+          scheduledKey: scheduledKey,
+          takenTime: null,
+          status: MedicineLogStatus.missed,
+          dateKey: dateKey,
+        );
 
-
-      if (exists) continue;
-
-      final log = MedicineLog(
-        id: '',
-        medicineId: med.id,
-        medicineName: med.name,
-        scheduledTime: scheduledTime,
-        scheduledKey: scheduledKey,
-        takenTime: null,
-        status: MedicineLogStatus.missed,
-        dateKey: dateKey,
-      );
-
-
-      await logService.createLog(log);
+        await logService.createLog(log);
+      }
     }
   }
-}
-
 
   // ─────────────────────────────────────
 
- Future<void> _loadMedicines() async {
-  final meds = await _service.getMedicines();
+  Future<void> _loadMedicines() async {
+    final meds = await _service.getMedicines();
 
-  // ALWAYS safe now (idempotent)
-  await _generateTodayLogs(meds);
+    // ALWAYS safe now (idempotent)
+    await _generateTodayLogs(meds);
 
-  setState(() {
-    _medicines
-      ..clear()
-      ..addAll(meds);
-    _loading = false;
-  });
-}
-
-
+    setState(() {
+      _medicines
+        ..clear()
+        ..addAll(meds);
+      _loading = false;
+    });
+  }
 
   // ─────────────────────────────────────
 
@@ -122,9 +117,7 @@ Future<void> _generateTodayLogs(List<Medicine> medicines) async {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const TodayMedicinesScreen(),
-                ),
+                MaterialPageRoute(builder: (_) => const TodayMedicinesScreen()),
               );
             },
           ),
@@ -139,8 +132,8 @@ Future<void> _generateTodayLogs(List<Medicine> medicines) async {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _medicines.isEmpty
-              ? _emptyState()
-              : _medicineList(),
+          ? _emptyState()
+          : _medicineList(),
     );
   }
 
@@ -149,9 +142,7 @@ Future<void> _generateTodayLogs(List<Medicine> medicines) async {
   Future<void> _openAddMedicine() async {
     final medicine = await Navigator.push<Medicine>(
       context,
-      MaterialPageRoute(
-        builder: (_) => const AddMedicineScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const AddMedicineScreen()),
     );
 
     if (medicine == null) return;
@@ -166,9 +157,7 @@ Future<void> _generateTodayLogs(List<Medicine> medicines) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => AddMedicineScreen(
-          medicine: _medicines[index],
-        ),
+        builder: (_) => AddMedicineScreen(medicine: _medicines[index]),
       ),
     );
 
@@ -215,19 +204,36 @@ Future<void> _generateTodayLogs(List<Medicine> medicines) async {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  med.name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        med.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.history, color: Colors.white70),
+                      tooltip: "View history",
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MedicineHistoryScreen(
+                              medicine: med,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  med.dosage,
-                  style: const TextStyle(color: Colors.white70),
-                ),
+                Text(med.dosage, style: const TextStyle(color: Colors.white70)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
