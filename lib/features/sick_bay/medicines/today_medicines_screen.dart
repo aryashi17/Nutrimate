@@ -4,6 +4,7 @@ import 'dart:async';
 
 import '../../../core/models/medicine_log.dart';
 import '../../../core/services/medicine_log_service.dart';
+import 'calendar_history_screen.dart';
 
 class TodayMedicinesScreen extends StatefulWidget {
   const TodayMedicinesScreen({super.key});
@@ -22,7 +23,6 @@ class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
 
   static const Duration _gracePeriod = Duration(minutes: 30);
   Timer? _missedTimer;
-
 
   final MedicineLogService _logService = MedicineLogService();
 
@@ -58,8 +58,7 @@ class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
       // Skip already handled states
       if (log.status != MedicineLogStatus.missed) continue;
 
-      final isOverdue =
-          now.isAfter(log.scheduledTime.add(_gracePeriod));
+      final isOverdue = now.isAfter(log.scheduledTime.add(_gracePeriod));
 
       if (!isOverdue) continue;
 
@@ -167,7 +166,22 @@ class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
         title: const Text("Today's Medicines"),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_today),
+            tooltip: "View daily history",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const CalendarHistoryScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
+
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _logs.isEmpty
@@ -194,105 +208,102 @@ class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
 
   // ─────────────────────────────────────
 
- Widget _logsList() {
-  return ListView.builder(
-    padding: const EdgeInsets.all(16),
-    itemCount: _logs.length,
-    itemBuilder: (context, index) {
-      final log = _logs[index];
+  Widget _logsList() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _logs.length,
+      itemBuilder: (context, index) {
+        final log = _logs[index];
 
-      return AnimatedOpacity(
-        duration: const Duration(milliseconds: 300),
-        opacity: log.status == MedicineLogStatus.missed ? 0.55 : 1.0,
-        child: AnimatedScale(
+        final missedText = _missedLabel(log);
+
+        return AnimatedOpacity(
           duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-          scale: log.status == MedicineLogStatus.missed ? 0.97 : 1.0,
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  log.medicineName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _formatTime(log.scheduledTime),
-                  style: const TextStyle(color: Colors.white70),
-                ),
-
-                if (log.status == MedicineLogStatus.missed)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      _missedLabel(log),
-                      style: const TextStyle(
-                        color: Colors.redAccent,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+          opacity: log.status == MedicineLogStatus.missed ? 0.55 : 1.0,
+          child: AnimatedScale(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+            scale: log.status == MedicineLogStatus.missed ? 0.97 : 1.0,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    log.medicineName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-
-                const SizedBox(height: 12),
-
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 150),
-                  switchInCurve: Curves.easeOut,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, animation) {
-                    return ScaleTransition(
-                      scale: Tween<double>(begin: 0.95, end: 1.0)
-                          .animate(animation),
-                      child: FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: Row(
-                    key: ValueKey(log.status),
-                    children: [
-                      _actionButton(
-                        label: "Taken",
-                        color: Colors.greenAccent,
-                        active:
-                            log.status == MedicineLogStatus.taken,
-                        onTap: () =>
-                            _updateStatus(log, MedicineLogStatus.taken),
-                      ),
-                      const SizedBox(width: 12),
-                      _actionButton(
-                        label: "Skipped",
-                        color: Colors.redAccent,
-                        active:
-                            log.status == MedicineLogStatus.skipped,
-                        onTap: () =>
-                            _updateStatus(log, MedicineLogStatus.skipped),
-                      ),
-                    ],
+                  const SizedBox(height: 4),
+                  Text(
+                    _formatTime(log.scheduledTime),
+                    style: const TextStyle(color: Colors.white70),
                   ),
-                ),
-              ],
+                  if (log.status == MedicineLogStatus.missed && missedText.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          missedText,
+                          style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+
+                  const SizedBox(height: 12),
+
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 150),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) {
+                      return ScaleTransition(
+                        scale: Tween<double>(
+                          begin: 0.95,
+                          end: 1.0,
+                        ).animate(animation),
+                        child: FadeTransition(opacity: animation, child: child),
+                      );
+                    },
+                    child: Row(
+                      key: ValueKey(log.status),
+                      children: [
+                        _actionButton(
+                          label: "Taken",
+                          color: Colors.greenAccent,
+                          active: log.status == MedicineLogStatus.taken,
+                          onTap: () =>
+                              _updateStatus(log, MedicineLogStatus.taken),
+                        ),
+                        const SizedBox(width: 12),
+                        _actionButton(
+                          label: "Skipped",
+                          color: Colors.redAccent,
+                          active: log.status == MedicineLogStatus.skipped,
+                          onTap: () =>
+                              _updateStatus(log, MedicineLogStatus.skipped),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
-
+        );
+      },
+    );
+  }
 
   // ─────────────────────────────────────
 
@@ -388,7 +399,18 @@ class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
 
   String _missedLabel(MedicineLog log) {
     final now = DateTime.now();
+
+    // If the dose is in the future, show nothing
+    if (now.isBefore(log.scheduledTime)) {
+      return "";
+    }
+
     final diff = now.difference(log.scheduledTime);
+
+    // Extra safety: no negative values
+    if (diff.isNegative) {
+      return "";
+    }
 
     if (diff.inMinutes < 60) {
       return "Missed • ${diff.inMinutes} min late";
@@ -398,5 +420,4 @@ class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
       return "Missed • ${hours}h ${minutes}m late";
     }
   }
-
 }
