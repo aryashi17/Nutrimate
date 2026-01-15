@@ -1,55 +1,49 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import './mess_menu_service.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import '../models/sick_bay_result.dart';
+import './mess_menu_service.dart';
 
 class SickBayService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final MessMenuService _menuService = MessMenuService();
 
-  /// Get today's menu as list of food names
+  /// Get today's menu as a flat list of food names
   Future<List<String>> getTodaysMenu() async {
-    final menu = await MessMenuService().getTodayMenu();
+    final menuMap = await _menuService.getTodayMenu();
 
-    return menu.values
-        .expand((meal) => meal)
+    return menuMap.values
+        .expand((mealList) => mealList)
         .map((item) => item['name'] as String)
         .toList();
   }
 
-  /// TEMP deterministic logic (replace with Gemini later)
+  /// Analyze sickness using Cloud Function
   Future<SickBayResult> analyzeSickness({
     required String description,
     required List<String> selectedAilments,
     required List<String> todaysMenu,
   }) async {
-    await Future.delayed(const Duration(seconds: 1));
+    final url = Uri.parse(
+      "https://us-central1-nutimate-app.cloudfunctions.net/analyzeSickness",
+    );
 
-    if (selectedAilments.contains("Fever")) {
-      return SickBayResult(
-        eat: ["Curd", "Plain Rice", "Khichdi"],
-        avoid: ["Fried Food", "Cold Drinks"],
-        care: [
-          "Take rest",
-          "Drink warm fluids",
-          "Consult doctor if persists"
-        ],
-        severity: "mild",
-      );
-    }
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "description": description,
+        "ailments": selectedAilments,
+        "nextMeal": todaysMenu,
+      }),
+    );
 
-    if (selectedAilments.contains("Stomach Pain")) {
-      return SickBayResult(
-        eat: ["Banana", "Curd"],
-        avoid: ["Spicy Food", "Street Food"],
-        care: ["Stay hydrated"],
-        severity: "moderate",
-      );
-    }
+    final data = jsonDecode(response.body);
 
     return SickBayResult(
-      eat: ["Home cooked food"],
-      avoid: ["Junk food"],
-      care: ["Monitor symptoms"],
-      severity: "low",
+      severity: data["severity"],
+      eat: List<String>.from(data["eat"]),
+      avoid: List<String>.from(data["avoid"]),
+      care: List<String>.from(data["care"]),
     );
   }
 }
