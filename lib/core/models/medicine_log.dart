@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 enum MedicineLogStatus { taken, skipped, missed }
 
 class MedicineLog {
+  final String scheduledKey;
   final String id;
   final String medicineId;
   final String medicineName;
@@ -19,6 +20,7 @@ class MedicineLog {
     this.takenTime,
     required this.status,
     required this.dateKey,
+    required this.scheduledKey,
   });
 
   factory MedicineLog.fromMap(String id, Map<String, dynamic> data) {
@@ -30,9 +32,11 @@ class MedicineLog {
       takenTime: data['takenTime'] != null
           ? (data['takenTime'] as Timestamp).toDate()
           : null,
-      status: MedicineLogStatus.values
-          .firstWhere((e) => e.name == data['status']),
+      status: MedicineLogStatus.values.firstWhere(
+        (e) => e.name == data['status'],
+      ),
       dateKey: data['dateKey'],
+      scheduledKey: data['scheduledKey'],
     );
   }
 
@@ -41,10 +45,10 @@ class MedicineLog {
       'medicineId': medicineId,
       'medicineName': medicineName,
       'scheduledTime': Timestamp.fromDate(scheduledTime),
-      'takenTime':
-          takenTime != null ? Timestamp.fromDate(takenTime!) : null,
+      'takenTime': takenTime != null ? Timestamp.fromDate(takenTime!) : null,
       'status': status.name,
       'dateKey': dateKey,
+      'scheduledKey' : scheduledKey,
     };
   }
 }

@@ -5,6 +5,7 @@ import '../../../core/services/medicine_service.dart';
 import 'add_medicine_screen.dart';
 import '../../../core/services/medicine_log_service.dart';
 import '../../../core/models/medicine_log.dart';
+import 'today_medicines_screen.dart';
 
 
 class MedicinesScreen extends StatefulWidget {
@@ -39,10 +40,7 @@ Future<void> _generateTodayLogs(List<Medicine> medicines) async {
   final dateKey = _todayKey();
 
   for (final med in medicines) {
-    // Skip inactive medicines
     if (!med.isActive) continue;
-
-    // Skip expired medicines
     if (med.endDate != null && med.endDate!.isBefore(today)) continue;
 
     for (final time in med.times) {
@@ -54,51 +52,58 @@ Future<void> _generateTodayLogs(List<Medicine> medicines) async {
         today.day,
         int.parse(parts[0]),
         int.parse(parts[1]),
+        0, 0, 0,
       );
+
+      final scheduledKey =
+        "${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}";
+
+
+
+      // 🔥 CHECK PER DOSE
+      final exists = await logService.logExists(
+        medicineId: med.id,
+        dateKey: dateKey,
+        scheduledKey: scheduledKey,
+      );
+
+
+      if (exists) continue;
 
       final log = MedicineLog(
         id: '',
         medicineId: med.id,
         medicineName: med.name,
         scheduledTime: scheduledTime,
+        scheduledKey: scheduledKey,
         takenTime: null,
-        status: MedicineLogStatus.missed, // default
+        status: MedicineLogStatus.missed,
         dateKey: dateKey,
       );
+
 
       await logService.createLog(log);
     }
   }
 }
 
-Future<void> _ensureTodayLogs(List<Medicine> medicines) async {
-  final logService = MedicineLogService();
-  final dateKey = _todayKey();
-
-  final exists = await logService.logsExistForDate(dateKey);
-  if (exists) return;
-
-  await _generateTodayLogs(medicines);
-}
-
-
-
 
   // ─────────────────────────────────────
 
-  Future<void> _loadMedicines() async {
-    final meds = await _service.getMedicines();
+ Future<void> _loadMedicines() async {
+  final meds = await _service.getMedicines();
 
-    // 🔥 STEP 13 ACTUALLY RUNS HERE
-    await _ensureTodayLogs(meds);
+  // ALWAYS safe now (idempotent)
+  await _generateTodayLogs(meds);
 
-    setState(() {
-      _medicines
-        ..clear()
-        ..addAll(meds);
-      _loading = false;
-    });
-  }
+  setState(() {
+    _medicines
+      ..clear()
+      ..addAll(meds);
+    _loading = false;
+  });
+}
+
 
 
   // ─────────────────────────────────────
@@ -111,7 +116,21 @@ Future<void> _ensureTodayLogs(List<Medicine> medicines) async {
         title: const Text("Medicines"),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.today_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const TodayMedicinesScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
+
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFFAAF0D1),
         onPressed: _openAddMedicine,

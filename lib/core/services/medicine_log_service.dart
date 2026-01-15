@@ -57,13 +57,21 @@ class MedicineLogService {
         .toList();
   }
 
-  Future<bool> logsExistForDate(String dateKey) async {
-    final snap = await _collection
-        .where('dateKey', isEqualTo: dateKey)
-        .limit(1)
-        .get();
+ Future<bool> logExists({
+  required String medicineId,
+  required String dateKey,
+  required String scheduledKey,
+}) async {
+  final snap = await _collection
+      .where('medicineId', isEqualTo: medicineId)
+      .where('dateKey', isEqualTo: dateKey)
+      .where('scheduledKey', isEqualTo: scheduledKey)
+      .limit(1)
+      .get();
 
-    return snap.docs.isNotEmpty;
-  }
+  return snap.docs.isNotEmpty;
+}
+
+
 
 }
