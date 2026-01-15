@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'dart:async';
 
 import '../../../core/models/medicine_log.dart';
 import '../../../core/services/medicine_log_service.dart';
@@ -13,14 +13,16 @@ class TodayMedicinesScreen extends StatefulWidget {
 }
 
 class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
-
   int get _takenCount =>
-    _logs.where((l) => l.status == MedicineLogStatus.taken).length;
+      _logs.where((l) => l.status == MedicineLogStatus.taken).length;
 
   int get _totalCount => _logs.length;
 
-  double get _progress =>
-      _totalCount == 0 ? 0 : _takenCount / _totalCount;
+  double get _progress => _totalCount == 0 ? 0 : _takenCount / _totalCount;
+
+  static const Duration _gracePeriod = Duration(minutes: 30);
+  Timer? _missedTimer;
+
 
   final MedicineLogService _logService = MedicineLogService();
 
@@ -31,6 +33,60 @@ class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
   void initState() {
     super.initState();
     _loadTodayLogs();
+    _startMissedWatcher();
+  }
+
+  @override
+  void dispose() {
+    _missedTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startMissedWatcher() {
+    _missedTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => _checkAndMarkMissed(),
+    );
+  }
+
+  Future<void> _checkAndMarkMissed() async {
+    final now = DateTime.now();
+
+    for (int i = 0; i < _logs.length; i++) {
+      final log = _logs[i];
+
+      // Skip already handled states
+      if (log.status != MedicineLogStatus.missed) continue;
+
+      final isOverdue =
+          now.isAfter(log.scheduledTime.add(_gracePeriod));
+
+      if (!isOverdue) continue;
+
+      // 🔥 Optimistically animate UI (already looks missed)
+      setState(() {
+        _logs[i] = MedicineLog(
+          id: log.id,
+          medicineId: log.medicineId,
+          medicineName: log.medicineName,
+          scheduledTime: log.scheduledTime,
+          scheduledKey: log.scheduledKey,
+          takenTime: null,
+          status: MedicineLogStatus.missed,
+          dateKey: log.dateKey,
+        );
+      });
+
+      // 🔥 Persist ONCE (important)
+      try {
+        await _logService.updateStatus(
+          logId: log.id,
+          status: MedicineLogStatus.missed,
+        );
+      } catch (e) {
+        debugPrint("Failed to auto-mark missed: $e");
+      }
+    }
   }
 
   // ─────────────────────────────────────
@@ -112,16 +168,16 @@ class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-     body: _loading
-        ? const Center(child: CircularProgressIndicator())
-        : _logs.isEmpty
-            ? _emptyState()
-            : Column(
-                children: [
-                  _progressRing(),        // 👈 progress ring
-                  Expanded(child: _logsList()),
-                ],
-              ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _logs.isEmpty
+          ? _emptyState()
+          : Column(
+              children: [
+                _progressRing(), // 👈 progress ring
+                Expanded(child: _logsList()),
+              ],
+            ),
     );
   }
 
@@ -138,76 +194,105 @@ class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
 
   // ─────────────────────────────────────
 
-  Widget _logsList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _logs.length,
-      itemBuilder: (context, index) {
-        final log = _logs[index];
+ Widget _logsList() {
+  return ListView.builder(
+    padding: const EdgeInsets.all(16),
+    itemCount: _logs.length,
+    itemBuilder: (context, index) {
+      final log = _logs[index];
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                log.medicineName,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+      return AnimatedOpacity(
+        duration: const Duration(milliseconds: 300),
+        opacity: log.status == MedicineLogStatus.missed ? 0.55 : 1.0,
+        child: AnimatedScale(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+          scale: log.status == MedicineLogStatus.missed ? 0.97 : 1.0,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  log.medicineName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                _formatTime(log.scheduledTime),
-                style: const TextStyle(color: Colors.white70),
-              ),
-              const SizedBox(height: 12),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 150),
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                transitionBuilder: (child, animation) {
-                  return ScaleTransition(
-                    scale: Tween<double>(
-                      begin: 0.95,
-                      end: 1.0,
-                    ).animate(animation),
-                    child: FadeTransition(opacity: animation, child: child),
-                  );
-                },
-                child: Row(
-                  key: ValueKey(log.status), // 🔥 IMPORTANT
-                  children: [
-                    _actionButton(
-                      label: "Taken",
-                      color: Colors.greenAccent,
-                      active: log.status == MedicineLogStatus.taken,
-                      onTap: () => _updateStatus(log, MedicineLogStatus.taken),
-                    ),
-                    const SizedBox(width: 12),
-                    _actionButton(
-                      label: "Skipped",
-                      color: Colors.redAccent,
-                      active: log.status == MedicineLogStatus.skipped,
-                      onTap: () =>
-                          _updateStatus(log, MedicineLogStatus.skipped),
-                    ),
-                  ],
+                const SizedBox(height: 4),
+                Text(
+                  _formatTime(log.scheduledTime),
+                  style: const TextStyle(color: Colors.white70),
                 ),
-              ),
-            ],
+
+                if (log.status == MedicineLogStatus.missed)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      _missedLabel(log),
+                      style: const TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+
+                const SizedBox(height: 12),
+
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 150),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, animation) {
+                    return ScaleTransition(
+                      scale: Tween<double>(begin: 0.95, end: 1.0)
+                          .animate(animation),
+                      child: FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Row(
+                    key: ValueKey(log.status),
+                    children: [
+                      _actionButton(
+                        label: "Taken",
+                        color: Colors.greenAccent,
+                        active:
+                            log.status == MedicineLogStatus.taken,
+                        onTap: () =>
+                            _updateStatus(log, MedicineLogStatus.taken),
+                      ),
+                      const SizedBox(width: 12),
+                      _actionButton(
+                        label: "Skipped",
+                        color: Colors.redAccent,
+                        active:
+                            log.status == MedicineLogStatus.skipped,
+                        onTap: () =>
+                            _updateStatus(log, MedicineLogStatus.skipped),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
 
   // ─────────────────────────────────────
 
@@ -301,5 +386,17 @@ class _TodayMedicinesScreenState extends State<TodayMedicinesScreen> {
     );
   }
 
-}
+  String _missedLabel(MedicineLog log) {
+    final now = DateTime.now();
+    final diff = now.difference(log.scheduledTime);
 
+    if (diff.inMinutes < 60) {
+      return "Missed • ${diff.inMinutes} min late";
+    } else {
+      final hours = diff.inHours;
+      final minutes = diff.inMinutes % 60;
+      return "Missed • ${hours}h ${minutes}m late";
+    }
+  }
+
+}
