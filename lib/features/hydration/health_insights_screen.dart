@@ -12,6 +12,17 @@ class HealthInsightsScreen extends StatelessWidget {
     final engine = Provider.of<CalculatorEngine>(context);
                 final emergencyMessage = engine.getEmergencyFix();
 
+
+    final proteinPercent = engine.proteinGoal > 0 ? (engine.totalProtein / engine.proteinGoal) : 0.0;
+final carbPercent = engine.carbGoal > 0 ? (engine.currentCarbs / engine.carbGoal) : 0.0;
+Color energyColor = (carbPercent < 0.3) ? Colors.orangeAccent : Colors.blueAccent;
+
+  Color fixColor = const Color(0xFFAAF0D1); // Default Mint
+  if (proteinPercent < 0.4) {
+    fixColor = Colors.redAccent; // Urgent
+  } else if (proteinPercent < 0.7) {
+    fixColor = Colors.orangeAccent; // Warning
+  }
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
       appBar: AppBar(
@@ -24,6 +35,19 @@ class HealthInsightsScreen extends StatelessWidget {
         child: Column(
           children: [
 
+            const SizedBox(height: 40), // Spacing for status bar
+          
+          // --- C. EMPTY STATE / MOTIVATION TEXT ---
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Text(
+              engine.totalProtein == 0 && engine.currentCarbs == 0
+                  ? "Your digital thali is empty! 🍽️\nHead to breakfast to start your fuel graph."
+                  : "Keep pushing toward your targets!",
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white70, fontSize: 14, fontStyle: FontStyle.italic),
+            ),
+          ),
             const Text(
       "DAILY NUTRIENT ACCUMULATION",
       style: TextStyle(
@@ -37,17 +61,37 @@ class HealthInsightsScreen extends StatelessWidget {
       "Tracking your progress for ${DateTime.now().day} ${_getMonth(DateTime.now().month)}",
       style: const TextStyle(color: Color(0xFF7EE081), fontSize: 16),
     ),
+
+    const SizedBox(height: 25), // Spacing
+
+// --- INSERT THIS BLOCK HERE ---
+const Text(
+  "SELECT CURRENT VIBE",
+  style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+),
+const SizedBox(height: 12),
+Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    _buildVibeChip(engine.isExamSeason, "📚 Exams", engine.toggleExamMode, Colors.blueAccent),
+    const SizedBox(width: 10),
+    _buildVibeChip(engine.isWorkoutDay, "💪 Gym", engine.toggleWorkoutMode, Colors.greenAccent),
+    const SizedBox(width: 10),
+    _buildVibeChip(engine.isUnwell, "🤒 Sick", engine.toggleSickMode, Colors.orangeAccent),
+  ],
+),
+// --- END OF INSERTION ---
+
             const SizedBox(height: 20),
             _buildMealChecklist(engine), 
     const SizedBox(height: 20),
 
 // Inside the Column, before the charts:
-if (emergencyMessage.isNotEmpty)
-  _buildInfoCard(
-    "Last Minute Action 🏃‍♂️",
-    emergencyMessage,
-    Colors.redAccent,
-  ),
+_buildInfoCard(
+  "Campus Food Fix 🥪",
+  emergencyMessage, // This variable was created at the top of build()
+  fixColor,        // This variable was created at the top of build()
+),
             // PROTEIN CHART
             MacroBar(
               label: "TOTAL DAILY PROTEIN",
@@ -68,14 +112,6 @@ if (emergencyMessage.isNotEmpty)
 
             const SizedBox(height: 30),
 
-            // DYNAMIC RECOMMENDATIONS
-            _buildInfoCard(
-              "Campus Food Fix 🥪",
-              engine.totalProtein < (engine.proteinGoal * 0.5)
-                  ? "You've missed half your protein! Try a double serving of Paneer or a protein shake at the kiosk."
-                  : "Great progress! Grab a handful of nuts to stay on track.",
-              const Color(0xFFAAF0D1),
-            ),
 
             // Inside health_insights_screen.dart Column
 
@@ -83,18 +119,18 @@ if (emergencyMessage.isNotEmpty)
 _buildInfoCard(
   "Protein Deficiency Risks ⚠️",
   engine.totalProtein < (engine.proteinGoal * 0.4)
-      ? "Critical Low! Lack of protein can lead to hair loss, muscle wasting, and a weakened immune system."
-      : "Your protein intake is protecting your muscle mass and skin health. Keep it up!",
-  engine.totalProtein < (engine.proteinGoal * 0.4) ? Colors.redAccent : Colors.greenAccent,
+      ? "Critical Low! Lack of protein can lead to muscle wasting."
+      : "Your protein intake is protecting your muscle mass.",
+  // Use fixColor here too for consistency!
+  proteinPercent < 0.4 ? Colors.redAccent : Colors.greenAccent, 
 ),
 
-// CARBS/ENERGY RISK ALERT
 _buildInfoCard(
   "Energy Analysis ⚡",
   engine.currentCarbs < (engine.carbGoal * 0.3)
-      ? "Low Energy Alert: You may experience 'brain fog', extreme fatigue, and dizziness during lectures."
+      ? "Low Energy Alert: You may experience 'brain fog' during lectures."
       : "Glucose levels are stable. You have enough fuel for mental focus.",
-  engine.currentCarbs < (engine.carbGoal * 0.3) ? Colors.orangeAccent : Colors.blueAccent,
+  energyColor, // Use the variable you created at the top!
 ),
           ],
         ),
@@ -144,4 +180,29 @@ Widget _buildMealChecklist(CalculatorEngine engine) {
     );
   }
   String _getMonth(int m) => ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m];
+
+  Widget _buildVibeChip(bool isActive, String label, VoidCallback onTap, Color activeColor) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: isActive ? activeColor.withOpacity(0.15) : Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: isActive ? activeColor : Colors.white10,
+          width: 1.5,
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: isActive ? activeColor : Colors.white60,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+  );
+}
 }
