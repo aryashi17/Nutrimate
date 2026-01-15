@@ -25,7 +25,9 @@ class _PlateMapperScreenState extends State<PlateMapperScreen> with TickerProvid
   double fillLevel = 0.0;
   String selectedSection = "Main";
   String activeTemplate = "Thali"; 
-  
+  // Side cup state (independent of plate)
+String cupSection = "Cup";
+
   // Plate Memory System
   final Map<String, String> plateOccupancy = {}; // section -> foodName
   final Map<String, double> sectionFillLevels = {}; // section -> fill percentage
@@ -173,19 +175,6 @@ void didUpdateWidget(covariant PlateMapperScreen oldWidget) {
     return null;
   }
 
-  // Get all sections for current template
-  // List<String> _getAllSectionsForTemplate(String template) {
-  //   switch (template) {
-  //     case 'Thali':
-  //       return ['Bowl 1', 'Bowl 2', 'Bowl 3', 'Rice/Roti'];
-  //     case 'Balanced':
-  //       return ['Veggies (50%)', 'Protein', 'Carbs'];
-  //     case 'Bowl':
-  //       return ['Main Bowl'];
-  //     default:
-  //       return [];
-  //   }
-  // }
   List<String> _getAllSectionsForTemplate(String template) {
   switch (template) {
     case 'Thali':
@@ -260,76 +249,233 @@ void didUpdateWidget(covariant PlateMapperScreen oldWidget) {
     );
   }
 
-  // Widget _buildVisualPlate() {
-  //   return Center(
-  //     child: Stack(
-  //       alignment: Alignment.center,
-  //       children: [
-  //         Container(
-  //           width: 300,
-  //           height: 300,
-  //           decoration: BoxDecoration(
-  //             shape: BoxShape.circle,
-  //             color: surface,
-  //             boxShadow: [
-  //               BoxShadow(color: accentMint.withOpacity(0.05), blurRadius: 40, spreadRadius: 10),
-  //               BoxShadow(color: Colors.black, blurRadius: 20, offset: const Offset(0, 10)),
-  //             ],
-  //             border: Border.all(color: Colors.white10, width: 2),
-  //           ),
-  //         ),
-  //         if (activeTemplate == "Thali") _buildThaliLayout(),
-  //         if (activeTemplate == "Balanced") _buildBalancedLayout(),
-  //         if (activeTemplate == "Bowl") _buildBowlLayout(),
-  //       ],
-  //     ),
-  //   );
-  // }
-  Widget _buildVisualPlate() {
+// Widget _buildVisualPlate() {
+//   return Center(
+//     child: AnimatedSwitcher(
+//       duration: const Duration(milliseconds: 300),
+//       child: _buildPlateForTemplate(activeTemplate),
+//     ),
+//   );
+// }
+Widget _buildVisualPlate() {
   return Center(
-    child: Container(
-      width: 320,
+    child: SizedBox(
+      width: 420, // 👈 wider than plate
       height: 260,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
         children: [
-          // Top 3 bowls
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _steelBowl(name: "Bowl 1"),
-              _steelBowl(name: "Bowl 2"),
-              _steelBowl(name: "Bowl 3"),
-            ],
+          // MAIN PLATE
+          Positioned(
+            left: 0,
+            child: _buildPlateForTemplate(activeTemplate),
           ),
-          const SizedBox(height: 12),
 
-          // Bottom compartments
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(child: _steelTrayBox(name: "Sabzi")),
-                const SizedBox(width: 10),
-                Expanded(flex: 2, child: _steelTrayBox(name: "Rice/Roti")),
-              ],
-            ),
+          // SIDE CUP (FLOATING, NOT CLIPPED)
+          Positioned(
+            right: -10,
+            top: 80,
+            child: _buildSideCup(),
           ),
         ],
       ),
     ),
   );
 }
+Widget _buildSideCup() {
+  const String name = "Cup";
+  bool isSel = selectedSection == name;
+  bool isOccupied =
+      plateOccupancy.containsKey(name) && plateOccupancy[name] != 'Empty';
+  double currentFill = sectionFillLevels[name] ?? 0.0;
+
+  return GestureDetector(
+    onTap: () => _handleSectionTap(name, isOccupied),
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      width: 64,
+      height: 80,
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(12),
+          bottom: Radius.circular(28),
+        ),
+
+        // CERAMIC CUP FEEL
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFFF5F5F5),
+            Color(0xFFBDBDBD),
+          ],
+        ),
+
+        border: Border.all(
+          color: isSel ? accentMint : Colors.grey.shade600,
+          width: isSel ? 3 : 1,
+        ),
+
+        boxShadow: [
+          BoxShadow(
+            color: isOccupied
+                ? accentMint.withOpacity(0.35)
+                : Colors.black.withOpacity(0.25),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: isOccupied
+                ? Icon(
+                    _getFoodIcon(plateOccupancy[name]!),
+                    key: ValueKey(plateOccupancy[name]),
+                    size: 26,
+                    color: Colors.black87,
+                  )
+                : const Text(
+                    "Cup",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54,
+                    ),
+                  ),
+          ),
+
+          if (isOccupied && currentFill > 0)
+            Positioned(
+              top: 6,
+              right: 6,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: bgDark.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  '${(currentFill * 100).toInt()}%',
+                  style: TextStyle(
+                    color: accentMint,
+                    fontSize: 8,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildPlateForTemplate(String template) {
+  switch (template) {
+    case 'Thali':
+      return _buildThaliSteelPlate();
+
+    case 'Balanced':
+      return _buildBalancedLayout();
+
+    case 'Bowl':
+      return _buildBowlLayout();
+
+    default:
+      return const SizedBox.shrink();
+  }
+}
+Widget _buildThaliSteelPlate() {
+  return Container(
+    width: 320,
+    height: 240,
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+  borderRadius: BorderRadius.circular(26),
+
+  // Steel gradient
+  gradient: const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      // Color.fromARGB(255, 107, 112, 110),
+       Color.fromARGB(255, 94, 95, 99),
+      // Color.fromARGB(255, 0, 0, 0),
+      Color.fromARGB(255, 30, 30, 31),
+    ],
+  ),
+
+  // Subtle steel rim
+  border: Border.all(
+    color: const Color.fromARGB(255, 236, 245, 236).withOpacity(0.08),
+    width: 1,
+  ),
+
+  boxShadow: [
+  // Inner highlight (pressed)
+  const BoxShadow(
+    color: Colors.white38,
+    offset: Offset(-2, -2),
+    blurRadius: 6,
+  ),
+  // Inner depth
+  BoxShadow(
+    color: Colors.black.withOpacity(0.35),
+    offset: const Offset(3, 4),
+    blurRadius: 8,
+  ),
+],
+
+),
+
+    child: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _steelBowl(name: "Bowl 1"),
+            _steelBowl(name: "Bowl 2"),
+            _steelBowl(name: "Bowl 3"),
+          ],
+        ),
+        // const SizedBox(height: 32),
+        // Expanded(
+        //   child: Row(
+        //     children: [
+        //       Expanded(child: _steelTrayBox(name: "Sabzi")),
+        //       const SizedBox(width: 12),
+        //       Expanded(flex: 2, child: _steelTrayBox(name: "Rice/Roti")),
+        //     ],
+        //   ),
+        // ),
+        SizedBox(
+  height: 130, // 👈 THIS is the key
+  child: Row(
+    children: [
+      Expanded(
+        flex: 2,
+        child: _steelTrayBox(name: "Sabzi"),
+      ),
+      const SizedBox(width: 14),
+      Expanded(
+        flex: 4,
+        child: _steelTrayBox(name: "Rice/Roti"),
+      ),
+    ],
+  ),
+),
+
+      ],
+    ),
+  );
+}
+
 Widget _steelBowl({required String name}) {
   bool isSel = selectedSection == name;
   bool isOccupied = plateOccupancy.containsKey(name) && plateOccupancy[name] != 'Empty';
@@ -345,8 +491,8 @@ Widget _steelBowl({required String name}) {
         shape: BoxShape.circle,
         gradient: LinearGradient(
           colors: [
-            Colors.grey.shade200,
-            Colors.grey.shade400,
+            const Color.fromARGB(255, 228, 230, 235),
+            const Color.fromARGB(255, 30, 30, 31),
           ],
         ),
         border: Border.all(
@@ -378,8 +524,8 @@ Widget _steelTrayBox({required String name}) {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.grey.shade200,
-            Colors.grey.shade400,
+            const Color.fromARGB(255, 221, 235, 238),
+            const Color.fromARGB(255, 8, 8, 8),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
@@ -448,22 +594,6 @@ Widget _sectionContent(String name, double fill, double iconSize) {
     ],
   );
 }
-
-
-  Widget _buildThaliLayout() {
-    return SizedBox(
-      width: 260,
-      height: 260,
-      child: Stack(
-        children: [
-          _circularBowl(top: 0, left: 70, name: "Bowl 1"),
-          _circularBowl(top: 40, left: 0, name: "Bowl 2"),
-          _circularBowl(top: 40, right: 0, name: "Bowl 3"),
-          _mainArea(bottom: 10, left: 30, name: "Rice/Roti"),
-        ],
-      ),
-    );
-  }
 
   Widget _buildBalancedLayout() {
     return 
