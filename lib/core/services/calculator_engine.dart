@@ -12,7 +12,15 @@ class CalculatorEngine extends ChangeNotifier {
   // --- HYDRATION DATA ---
   int totalDrank = 0;
   int bottlesCompleted = 0;
+bool isUnwell = false;
 
+// Inside CalculatorEngine
+bool isExamSeason = false; // Higher carb focus for brain power
+bool isWorkoutDay = false; // Higher protein/hydration focus
+
+void toggleSickMode() { isUnwell = !isUnwell; notifyListeners(); }
+void toggleExamMode() { isExamSeason = !isExamSeason; notifyListeners(); }
+void toggleWorkoutMode() { isWorkoutDay = !isWorkoutDay; notifyListeners(); }
   // --- USER PROFILE DATA ---
   double weight = 0.0; 
   double height = 0.0;
@@ -41,8 +49,20 @@ class CalculatorEngine extends ChangeNotifier {
   }
 
   // Getter for UI access
-  int get goal => dynamicGoal;
-
+int get goal {
+    // Basic formula: 35ml per kg
+    double baseGoal = weight * 35;
+    
+    if (gender == 'Male') baseGoal += 500; 
+    if (height > 180) baseGoal += 300;
+    
+    int finalGoal = baseGoal.toInt();
+    
+    // Extra fluids for recovery if sick
+    if (isUnwell) return finalGoal + 500; 
+    
+    return finalGoal;
+  }
   // --- 2. DYNAMIC CALORIE & MACRO GOALS (Uses Age) ---
   
   // Calculate BMR (Mifflin-St Jeor Equation)
@@ -63,8 +83,23 @@ class CalculatorEngine extends ChangeNotifier {
   double get dailyCalorieGoal => bmr * 1.2;
 
   // Macro Goals based on Calorie Goal
-  double get proteinGoal => (weight * 1.8); // 1.8g per kg bodyweight
-  double get carbGoal => (dailyCalorieGoal * 0.50) / 4; // 50% of diet from carbs, divide by 4 cal/g
+  double get proteinGoal {
+  double base = (weight * 1.8);
+  // If it's a gym day, we need more repair fuel!
+  if (isWorkoutDay) return base + 20; 
+  // If sick, body focuses on recovery, not muscle building
+  if (isUnwell) return base - 10;
+  return base;
+}
+
+double get carbGoal {
+  double base = (dailyCalorieGoal * 0.50) / 4;
+  // Brain fuel for exams!
+  if (isExamSeason) return base + 40; 
+  return base;
+}
+
+
   double get fatGoal => (dailyCalorieGoal * 0.25) / 9; // 25% of diet from fats, divide by 9 cal/g
 
   // --- 3. CURRENT PROGRESS VARIABLES ---
@@ -251,12 +286,43 @@ class CalculatorEngine extends ChangeNotifier {
 
   // --- 11. EMERGENCY FIX HELPER ---
   String getEmergencyFix() {
-    final now = DateTime.now();
-    if (now.hour < 20) return ""; 
-    if (totalProtein < (proteinGoal * 0.6)) return "🚨 LATE NIGHT PROTEIN FIX: Grab a Protein Shake!";
-    if (currentCarbs < (carbGoal * 0.6)) return "🚨 ENERGY DEFICIT: Eat a Banana!";
-    return "✅ You're all set for tonight.";
+    final hour = DateTime.now().hour;
+    // Calculate percentages to make logic more precise
+    double proteinPercent = (proteinGoal > 0) ? (totalProtein / proteinGoal) : 1.0;
+    double carbPercent = (carbGoal > 0) ? (currentCarbs / carbGoal) : 1.0;
+
+    // PRIORITY 1: SICKNESS (Global Override)
+    if (isUnwell) {
+      return "🤒 Sick Bay Mode: Stick to Electrol & Dal Khichdi. Your body needs easy-to-digest fuel right now.";
+    }
+
+    // PRIORITY 2: EXAM SEASON (Brain Fuel focus)
+    if (isExamSeason && carbPercent < 0.5 && hour < 18) {
+      return "🧠 Study Mode: Your brain runs on glucose. Grab a fruit or some Oats from Nescafe to keep that focus sharp!";
+    }
+
+    // PRIORITY 3: CRITICAL DEFICITS (Regardless of time)
+    if (proteinPercent < 0.3 && hour > 12) {
+      return "🚨 Muscle Alert: You've barely hit 30% protein and half the day is gone. Get a double paneer/chicken serving at lunch ASAP.";
+    }
+
+    // PRIORITY 4: TIME-BASED CAMPUS SPECIFICS
+    if (hour >= 21) { // Late Night
+       if (proteinPercent < 0.8) {
+         return "🌙 Late Night Recovery: Mess is closed. Grab a Peanut Butter sandwich or milk from the night canteen.";
+       }
+       return "✅ Recovery Ready: You've fueled well. Time for sleep!";
+    }
+
+    if (hour >= 16 && hour < 19) { // Snack Time
+      if (isWorkoutDay) return "🏋️ Post-Gym: Grab some boiled eggs or a protein shake from the kiosk now!";
+      return "☕ Tea Time: Pair your chai with roasted chana instead of biscuits for better macros.";
+    }
+
+    return "✅ Campus Fix: Your stats look solid for this time of day. Keep it steady!";
   }
+
+
 }
 
 class MonthLabels {
