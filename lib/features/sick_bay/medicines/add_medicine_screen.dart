@@ -21,6 +21,32 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   DateTime? _endDate;
 
   @override
+  void initState() {
+    super.initState();
+
+    final med = widget.medicine;
+    if (med != null) {
+      _nameController.text = med.name;
+      _dosageController.text = med.dosage;
+      _instructionController.text = med.instructions;
+      _startDate = med.startDate;
+      _endDate = med.endDate;
+
+      _times.addAll(
+        med.times.map((t) {
+          final parts = t.split(':');
+          return TimeOfDay(
+            hour: int.parse(parts[0]),
+            minute: int.parse(parts[1]),
+          );
+        }),
+      );
+
+      _sortTimes();
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _dosageController.dispose();
@@ -28,11 +54,26 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     super.dispose();
   }
 
+  // ─────────────────────────────────────
+
   String _formatTime(TimeOfDay time) {
     final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
     return "$hour:$minute";
   }
+
+  void _sortTimes() {
+    _times.sort((a, b) {
+      final aMin = a.hour * 60 + a.minute;
+      final bMin = b.hour * 60 + b.minute;
+      return aMin.compareTo(bMin);
+    });
+  }
+
+  bool get _canSave =>
+      _nameController.text.trim().isNotEmpty &&
+      _dosageController.text.trim().isNotEmpty &&
+      _times.isNotEmpty;
 
   // ─────────────────────────────────────
 
@@ -84,62 +125,6 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   }
 
   // ─────────────────────────────────────
-  @override
-  void initState() {
-    super.initState();
-
-    final med = widget.medicine;
-    if (med != null) {
-      _nameController.text = med.name;
-      _dosageController.text = med.dosage;
-      _instructionController.text = med.instructions;
-      _startDate = med.startDate;
-      _endDate = med.endDate;
-
-      _times.addAll(
-        med.times.map((t) {
-          final parts = t.split(':');
-          return TimeOfDay(
-            hour: int.parse(parts[0]),
-            minute: int.parse(parts[1]),
-          );
-        }),
-      );
-    }
-  }
-
-  void _confirmDelete() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: const Text(
-          "Delete Medicine?",
-          style: TextStyle(color: Colors.white),
-        ),
-        content: const Text(
-          "This medicine will be removed.",
-          style: TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // close dialog
-              Navigator.pop(context, 'delete'); // return result
-            },
-            child: const Text(
-              "Delete",
-              style: TextStyle(color: Colors.redAccent),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _input(
     String hint,
@@ -150,6 +135,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       controller: controller,
       maxLines: maxLines,
       style: const TextStyle(color: Colors.white),
+      onChanged: (_) => setState(() {}),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white54),
@@ -175,23 +161,29 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
         ),
         const SizedBox(height: 12),
 
-        Wrap(
-          spacing: 8,
-          children: _times.map((time) {
-            return Chip(
-              label: Text(
-                time.format(context),
-                style: const TextStyle(color: Colors.black),
-              ),
-              backgroundColor: const Color(0xFFAAF0D1),
-              onDeleted: () {
-                setState(() {
-                  _times.remove(time);
-                });
-              },
-            );
-          }).toList(),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _times.map((time) {
+              return Chip(
+                label: Text(
+                  time.format(context),
+                  style: const TextStyle(color: Colors.black),
+                ),
+                backgroundColor: const Color(0xFFAAF0D1),
+                onDeleted: () {
+                  setState(() {
+                    _times.remove(time);
+                  });
+                },
+              );
+            }).toList(),
+          ),
         ),
+
 
         const SizedBox(height: 12),
 
@@ -213,9 +205,18 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       initialTime: TimeOfDay.now(),
     );
 
-    if (time != null && !_times.contains(time)) {
-      setState(() => _times.add(time));
-    }
+    if (time == null) return;
+
+    final exists = _times.any(
+      (t) => t.hour == time.hour && t.minute == time.minute,
+    );
+
+    if (exists) return;
+
+    setState(() {
+      _times.add(time);
+      _sortTimes();
+    });
   }
 
   // ─────────────────────────────────────
@@ -237,7 +238,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
             style: const TextStyle(color: Colors.white70),
           ),
           trailing: const Icon(Icons.calendar_today, color: Colors.white70),
-          onTap: () => _pickStartDate(),
+          onTap: _pickStartDate,
         ),
 
         ListTile(
@@ -249,7 +250,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
             style: const TextStyle(color: Colors.white70),
           ),
           trailing: const Icon(Icons.calendar_today, color: Colors.white70),
-          onTap: () => _pickEndDate(),
+          onTap: _pickEndDate,
         ),
       ],
     );
@@ -290,11 +291,12 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFAAF0D1),
+          disabledBackgroundColor: Colors.white24,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
-        onPressed: _onSave,
+        onPressed: _canSave ? _onSave : null,
         child: const Text(
           "Save Medicine",
           style: TextStyle(
@@ -308,15 +310,6 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   }
 
   void _onSave() {
-    if (_nameController.text.isEmpty ||
-        _dosageController.text.isEmpty ||
-        _times.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill required fields")),
-      );
-      return;
-    }
-
     final medicine = Medicine(
       id: widget.medicine?.id ?? '',
       name: _nameController.text.trim(),
@@ -329,6 +322,39 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     );
 
     Navigator.pop(context, medicine);
+  }
+
+  void _confirmDelete() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Text(
+          "Delete Medicine?",
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          "This medicine will be removed.",
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context, 'delete');
+            },
+            child: const Text(
+              "Delete",
+              style: TextStyle(color: Colors.redAccent),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatDate(DateTime date) {
