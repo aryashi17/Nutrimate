@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.nutrimate_app-mergeDebugResources-74:/values-hdpi-v4/values-hdpi-v4.xml",
+            "map": [
+                {
+                    "source": "/home/priyanshu-pareek/.gradle/caches/8.13/transforms/cbcdb287235ff0b9b2d7328ed6cac285/transformed/appcompat-1.6.1/res/values-hdpi-v4/values-hdpi-v4.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "13",
+                        "endOffsets": "327"
+                    }
+                }
+            ]
+        }
+    ]
+}

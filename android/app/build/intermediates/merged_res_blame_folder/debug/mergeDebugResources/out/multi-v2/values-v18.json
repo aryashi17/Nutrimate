@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.nutrimate_app-mergeDebugResources-74:/values-v18/values-v18.xml",
+            "map": [
+                {
+                    "source": "/home/priyanshu-pareek/.gradle/caches/8.13/transforms/cbcdb287235ff0b9b2d7328ed6cac285/transformed/appcompat-1.6.1/res/values-v18/values-v18.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "48",
+                        "endOffsets": "99"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 {
-    "name": "nutrimate_app",
-    "short_name": "nutrimate_app",
+    "name": "nutrimate",
+    "short_name": "nutrimate",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

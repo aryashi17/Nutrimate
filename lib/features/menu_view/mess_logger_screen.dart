@@ -20,6 +20,8 @@ import '../sick_bay/sick_bay_screen.dart';
 import '../hydration/hydration_screen.dart';
 import '../profile/health_status_Section.dart';
 import '../menu/weekly_menu_screen.dart';
+import 'package:nutrimate_app/features/scanner/ai_scanner_screen.dart';
+
 
 class MessLoggerScreen extends StatefulWidget {
   const MessLoggerScreen({super.key});
@@ -380,9 +382,36 @@ final Map<String, Map<String, double>> mealPlateFills = {
             case 'Log Cloud':
               await _logPlateToFirebase();
               break;
-            case 'Add':
-              _showEditSheet();
-              break;
+           case 'Add':
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AiScannerScreen(),
+              ),
+            );
+
+            if (result == null || !mounted) return;
+
+            final food = result['food'];
+
+            setState(() {
+              mealData.putIfAbsent(selectedMeal, () => []);
+
+              mealData[selectedMeal]!.add({
+                'name': food['name'],
+                'calories': food['calories'],
+                'protein': food['protein'],
+                'carbs': food['carbs'],
+                'fat': food['fat'],
+                'portion': 1.0, // default full portion
+                'icon': Icons.fastfood_rounded,
+                'source': 'ai',
+              });
+            });
+
+            break;
+
+
             case 'Menu':
               Navigator.push(context, MaterialPageRoute(builder: (_) => const WeeklyMenuScreen()));
               break;
