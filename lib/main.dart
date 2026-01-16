@@ -21,6 +21,9 @@ import 'features/reports/summary_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
+import 'package:flutter/material.dart';
+import 'package:nutrimate_app/features/crossword/crossword_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -328,50 +331,50 @@ void _showTrivia(BuildContext context) {
       MaterialPageRoute(builder: (_) => const SummaryScreen()),
     ),
   ),
-  title: Stack(
-    alignment: Alignment.center,
-    children: [
-      StreamBuilder<int>(
-        stream: streakService.streakStream,
-        builder: (_, snapshot) {
-          final streak = snapshot.data ?? 0;
-          return GlassContainer(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.local_fire_department,
-                  color: Colors.orangeAccent,
-                  size: 30,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  "$streak",
-                  style: const TextStyle(
-                    color: Colors.orangeAccent,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    ],
-  ),
-  centerTitle: true, // 🔥 IMPORTANT
+  title: null, // Removed the big GlassContainer from here
+  centerTitle: true,
   actions: [
+    // 🔥 NEW COMPACT STREAK ICON
+    StreamBuilder<int>(
+      stream: streakService.streakStream,
+      builder: (_, snapshot) {
+        final streak = snapshot.data ?? 0;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.local_fire_department, color: Colors.orangeAccent, size: 22),
+            Text("$streak", style: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 14)),
+          ],
+        );
+      },
+    ),
+    const SizedBox(width: 15),// Spacing between Streak and Bulb
+    
+    
+    // 2. 🔥 ADD THIS: The Puzzle Icon
+    IconButton(
+      icon: const Icon(
+        Icons.extension_rounded, // Puzzle piece icon
+        color: Colors.greenAccent,
+        size: 24,
+      ),
+      onPressed: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const CrosswordScreen()),
+      ),
+    ),
+    const SizedBox(width: 8),
+    
+    
     IconButton(
       icon: const Icon(
         Icons.lightbulb_outline,
         color: Colors.amberAccent,
+        size: 24,
       ),
       onPressed: () => _showTrivia(context),
     ),
-    const SizedBox(width: 8),
+    const SizedBox(width: 12), // Padding from the right edge
   ],
 ),
 
@@ -462,6 +465,11 @@ void _showTrivia(BuildContext context) {
                         ),
                       ),
                       const SizedBox(height: 20),
+
+
+                      
+
+
                       NeonButton(
                         label: "FUEL STATION",
                         icon: Icons.restaurant,
