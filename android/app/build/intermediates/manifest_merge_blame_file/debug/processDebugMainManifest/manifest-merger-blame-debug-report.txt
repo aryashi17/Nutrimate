@@ -1,0 +1,846 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.nutrimate_app"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="36" />
+10    <!--
+11         The INTERNET permission is required for development. Specifically,
+12         the Flutter tool needs it to communicate with the running application
+13         to allow setting breakpoints, to provide hot reload, etc.
+14    -->
+15    <uses-permission android:name="android.permission.INTERNET" />
+15-->/home/priyanshu-pareek/Nutrimate/android/app/src/debug/AndroidManifest.xml:6:5-66
+15-->/home/priyanshu-pareek/Nutrimate/android/app/src/debug/AndroidManifest.xml:6:22-64
+16    <!--
+17     Required to query activities that can process text, see:
+18         https://developer.android.com/training/package-visibility and
+19         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+20
+21         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin.
+22    -->
+23    <queries>
+23-->/home/priyanshu-pareek/Nutrimate/android/app/src/main/AndroidManifest.xml:39:5-44:15
+24        <intent>
+24-->/home/priyanshu-pareek/Nutrimate/android/app/src/main/AndroidManifest.xml:40:9-43:18
+25            <action android:name="android.intent.action.PROCESS_TEXT" />
+25-->/home/priyanshu-pareek/Nutrimate/android/app/src/main/AndroidManifest.xml:41:13-72
+25-->/home/priyanshu-pareek/Nutrimate/android/app/src/main/AndroidManifest.xml:41:21-70
+26
+27            <data android:mimeType="text/plain" />
+27-->/home/priyanshu-pareek/Nutrimate/android/app/src/main/AndroidManifest.xml:42:13-50
+27-->/home/priyanshu-pareek/Nutrimate/android/app/src/main/AndroidManifest.xml:42:19-48
+28        </intent>
+29    </queries>
+30
+31    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+31-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:26:5-79
+31-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:26:22-76
+32    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- Required by older versions of Google Play services to create IID tokens -->
+32-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:24:5-68
+32-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:24:22-65
+33    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+33-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:26:5-82
+33-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:26:22-79
+34    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+34-->[com.google.android.recaptcha:recaptcha:18.6.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/65e9aa36d2d34f9e647bb4512e68afdb/transformed/recaptcha-18.6.1/AndroidManifest.xml:9:5-98
+34-->[com.google.android.recaptcha:recaptcha:18.6.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/65e9aa36d2d34f9e647bb4512e68afdb/transformed/recaptcha-18.6.1/AndroidManifest.xml:9:22-95
+35    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+35-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:27:5-81
+35-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:27:22-78
+36    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+36-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:28:5-77
+36-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:28:22-74
+37
+38    <permission
+38-->[androidx.core:core:1.13.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/517c680cec284a0c92940c666613c8e4/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+39        android:name="com.example.nutrimate_app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+39-->[androidx.core:core:1.13.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/517c680cec284a0c92940c666613c8e4/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+40        android:protectionLevel="signature" />
+40-->[androidx.core:core:1.13.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/517c680cec284a0c92940c666613c8e4/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+41
+42    <uses-permission android:name="com.example.nutrimate_app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+42-->[androidx.core:core:1.13.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/517c680cec284a0c92940c666613c8e4/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+42-->[androidx.core:core:1.13.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/517c680cec284a0c92940c666613c8e4/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+43
+44    <application
+45        android:name="android.app.Application"
+46        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+46-->[androidx.core:core:1.13.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/517c680cec284a0c92940c666613c8e4/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
+47        android:debuggable="true"
+48        android:extractNativeLibs="false"
+49        android:icon="@mipmap/ic_launcher"
+50        android:label="nutrimate_app" >
+51        <activity
+52            android:name="com.example.nutrimate_app.MainActivity"
+53            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+54            android:exported="true"
+55            android:hardwareAccelerated="true"
+56            android:launchMode="singleTop"
+57            android:taskAffinity=""
+58            android:theme="@style/LaunchTheme"
+59            android:windowSoftInputMode="adjustResize" >
+60
+61            <!--
+62                 Specifies an Android theme to apply to this Activity as soon as
+63                 the Android process has started. This theme is visible to the user
+64                 while the Flutter UI initializes. After that, this theme continues
+65                 to determine the Window background behind the Flutter UI.
+66            -->
+67            <meta-data
+68                android:name="io.flutter.embedding.android.NormalTheme"
+69                android:resource="@style/NormalTheme" />
+70
+71            <intent-filter>
+72                <action android:name="android.intent.action.MAIN" />
+73
+74                <category android:name="android.intent.category.LAUNCHER" />
+75            </intent-filter>
+76        </activity>
+77        <!--
+78             Don't delete the meta-data below.
+79             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
+80        -->
+81        <meta-data
+82            android:name="flutterEmbedding"
+83            android:value="2" />
+84
+85        <service
+85-->[:firebase_auth] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/firebase_auth-6.1.3/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:9-12:19
+86            android:name="com.google.firebase.components.ComponentDiscoveryService"
+86-->[:firebase_auth] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/firebase_auth-6.1.3/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:18-89
+87            android:directBootAware="true"
+87-->[com.google.firebase:firebase-common:22.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec033c6bc0259cf346b94f3841183d46/transformed/firebase-common-22.0.1/AndroidManifest.xml:32:13-43
+88            android:exported="false" >
+88-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:68:13-37
+89            <meta-data
+89-->[:firebase_auth] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/firebase_auth-6.1.3/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:13-11:85
+90                android:name="com.google.firebase.components:io.flutter.plugins.firebase.auth.FlutterFirebaseAuthRegistrar"
+90-->[:firebase_auth] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/firebase_auth-6.1.3/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:10:17-124
+91                android:value="com.google.firebase.components.ComponentRegistrar" />
+91-->[:firebase_auth] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/firebase_auth-6.1.3/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:17-82
+92            <meta-data
+92-->[:cloud_firestore] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/cloud_firestore-6.1.1/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:13-11:85
+93                android:name="com.google.firebase.components:io.flutter.plugins.firebase.firestore.FlutterFirebaseFirestoreRegistrar"
+93-->[:cloud_firestore] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/cloud_firestore-6.1.1/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:10:17-134
+94                android:value="com.google.firebase.components.ComponentRegistrar" />
+94-->[:cloud_firestore] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/cloud_firestore-6.1.1/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:17-82
+95            <meta-data
+95-->[:firebase_core] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/firebase_core-4.3.0/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:13-11:85
+96                android:name="com.google.firebase.components:io.flutter.plugins.firebase.core.FlutterFirebaseCoreRegistrar"
+96-->[:firebase_core] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/firebase_core-4.3.0/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:10:17-124
+97                android:value="com.google.firebase.components.ComponentRegistrar" />
+97-->[:firebase_core] /home/priyanshu-pareek/.pub-cache/hosted/pub.dev/firebase_core-4.3.0/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:17-82
+98            <meta-data
+98-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:69:13-71:85
+99                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+99-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:70:17-109
+100                android:value="com.google.firebase.components.ComponentRegistrar" />
+100-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:71:17-82
+101            <meta-data
+101-->[com.google.firebase:firebase-firestore:26.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cdd01474c635fe9a71b0cf733fd52d86/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:17:13-19:85
+102                android:name="com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar"
+102-->[com.google.firebase:firebase-firestore:26.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cdd01474c635fe9a71b0cf733fd52d86/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:18:17-122
+103                android:value="com.google.firebase.components.ComponentRegistrar" />
+103-->[com.google.firebase:firebase-firestore:26.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cdd01474c635fe9a71b0cf733fd52d86/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:19:17-82
+104            <meta-data
+104-->[com.google.firebase:firebase-firestore:26.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cdd01474c635fe9a71b0cf733fd52d86/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:20:13-22:85
+105                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
+105-->[com.google.firebase:firebase-firestore:26.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cdd01474c635fe9a71b0cf733fd52d86/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:21:17-111
+106                android:value="com.google.firebase.components.ComponentRegistrar" />
+106-->[com.google.firebase:firebase-firestore:26.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cdd01474c635fe9a71b0cf733fd52d86/transformed/firebase-firestore-26.0.2/AndroidManifest.xml:22:17-82
+107            <meta-data
+107-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:32:13-34:85
+108                android:name="com.google.firebase.components:com.google.firebase.iid.Registrar"
+108-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:33:17-96
+109                android:value="com.google.firebase.components.ComponentRegistrar" />
+109-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:34:17-82
+110            <meta-data
+110-->[com.google.firebase:firebase-installations:19.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/71bf9758da7a43e9ecaf4b0581f1e26c/transformed/firebase-installations-19.0.1/AndroidManifest.xml:15:13-17:85
+111                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar"
+111-->[com.google.firebase:firebase-installations:19.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/71bf9758da7a43e9ecaf4b0581f1e26c/transformed/firebase-installations-19.0.1/AndroidManifest.xml:16:17-130
+112                android:value="com.google.firebase.components.ComponentRegistrar" />
+112-->[com.google.firebase:firebase-installations:19.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/71bf9758da7a43e9ecaf4b0581f1e26c/transformed/firebase-installations-19.0.1/AndroidManifest.xml:17:17-82
+113            <meta-data
+113-->[com.google.firebase:firebase-installations:19.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/71bf9758da7a43e9ecaf4b0581f1e26c/transformed/firebase-installations-19.0.1/AndroidManifest.xml:18:13-20:85
+114                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
+114-->[com.google.firebase:firebase-installations:19.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/71bf9758da7a43e9ecaf4b0581f1e26c/transformed/firebase-installations-19.0.1/AndroidManifest.xml:19:17-127
+115                android:value="com.google.firebase.components.ComponentRegistrar" />
+115-->[com.google.firebase:firebase-installations:19.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/71bf9758da7a43e9ecaf4b0581f1e26c/transformed/firebase-installations-19.0.1/AndroidManifest.xml:20:17-82
+116            <meta-data
+116-->[com.google.firebase:firebase-common:22.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec033c6bc0259cf346b94f3841183d46/transformed/firebase-common-22.0.1/AndroidManifest.xml:35:13-37:85
+117                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+117-->[com.google.firebase:firebase-common:22.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec033c6bc0259cf346b94f3841183d46/transformed/firebase-common-22.0.1/AndroidManifest.xml:36:17-109
+118                android:value="com.google.firebase.components.ComponentRegistrar" />
+118-->[com.google.firebase:firebase-common:22.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec033c6bc0259cf346b94f3841183d46/transformed/firebase-common-22.0.1/AndroidManifest.xml:37:17-82
+119        </service>
+120
+121        <activity
+121-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:29:9-46:20
+122            android:name="com.google.firebase.auth.internal.GenericIdpActivity"
+122-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:30:13-80
+123            android:excludeFromRecents="true"
+123-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:31:13-46
+124            android:exported="true"
+124-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:32:13-36
+125            android:launchMode="singleTask"
+125-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:33:13-44
+126            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+126-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:34:13-72
+127            <intent-filter>
+127-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:35:13-45:29
+128                <action android:name="android.intent.action.VIEW" />
+128-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:17-69
+128-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:25-66
+129
+130                <category android:name="android.intent.category.DEFAULT" />
+130-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:17-76
+130-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:27-73
+131                <category android:name="android.intent.category.BROWSABLE" />
+131-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:17-78
+131-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:27-75
+132
+133                <data
+133-->/home/priyanshu-pareek/Nutrimate/android/app/src/main/AndroidManifest.xml:42:13-50
+134                    android:host="firebase.auth"
+135                    android:path="/"
+136                    android:scheme="genericidp" />
+137            </intent-filter>
+138        </activity>
+139        <activity
+139-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:47:9-64:20
+140            android:name="com.google.firebase.auth.internal.RecaptchaActivity"
+140-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:48:13-79
+141            android:excludeFromRecents="true"
+141-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:49:13-46
+142            android:exported="true"
+142-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:50:13-36
+143            android:launchMode="singleTask"
+143-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:51:13-44
+144            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+144-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:52:13-72
+145            <intent-filter>
+145-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:53:13-63:29
+146                <action android:name="android.intent.action.VIEW" />
+146-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:17-69
+146-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:25-66
+147
+148                <category android:name="android.intent.category.DEFAULT" />
+148-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:17-76
+148-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:27-73
+149                <category android:name="android.intent.category.BROWSABLE" />
+149-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:17-78
+149-->[com.google.firebase:firebase-auth:24.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed4461a79c653d4b58509142a134c0e4/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:27-75
+150
+151                <data
+151-->/home/priyanshu-pareek/Nutrimate/android/app/src/main/AndroidManifest.xml:42:13-50
+152                    android:host="firebase.auth"
+153                    android:path="/"
+154                    android:scheme="recaptcha" />
+155            </intent-filter>
+156        </activity>
+157
+158        <service
+158-->[com.google.mlkit:linkfirebase:17.0.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f29f5520970f504299c490c032bcebf8/transformed/linkfirebase-17.0.0/AndroidManifest.xml:9:9-15:19
+159            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
+159-->[com.google.mlkit:linkfirebase:17.0.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f29f5520970f504299c490c032bcebf8/transformed/linkfirebase-17.0.0/AndroidManifest.xml:10:13-91
+160            android:directBootAware="true"
+160-->[com.google.mlkit:common:18.11.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/1592ad6f4326895494238c1060d5f8bb/transformed/common-18.11.0/AndroidManifest.xml:17:13-43
+161            android:exported="false" >
+161-->[com.google.mlkit:linkfirebase:17.0.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f29f5520970f504299c490c032bcebf8/transformed/linkfirebase-17.0.0/AndroidManifest.xml:11:13-37
+162            <meta-data
+162-->[com.google.mlkit:linkfirebase:17.0.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f29f5520970f504299c490c032bcebf8/transformed/linkfirebase-17.0.0/AndroidManifest.xml:12:13-14:85
+163                android:name="com.google.firebase.components:com.google.mlkit.linkfirebase.internal.LinkFirebaseComponentRegistrar"
+163-->[com.google.mlkit:linkfirebase:17.0.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f29f5520970f504299c490c032bcebf8/transformed/linkfirebase-17.0.0/AndroidManifest.xml:13:17-132
+164                android:value="com.google.firebase.components.ComponentRegistrar" />
+164-->[com.google.mlkit:linkfirebase:17.0.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f29f5520970f504299c490c032bcebf8/transformed/linkfirebase-17.0.0/AndroidManifest.xml:14:17-82
+165            <meta-data
+165-->[com.google.mlkit:face-mesh-detection:16.0.0-beta2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/fdd4350950800f69ff4e70c5b760b5af/transformed/face-mesh-detection-16.0.0-beta2/AndroidManifest.xml:11:13-13:85
+166                android:name="com.google.firebase.components:com.google.mlkit.vision.facemesh.internal.FaceMeshRegistrar"
+166-->[com.google.mlkit:face-mesh-detection:16.0.0-beta2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/fdd4350950800f69ff4e70c5b760b5af/transformed/face-mesh-detection-16.0.0-beta2/AndroidManifest.xml:12:17-122
+167                android:value="com.google.firebase.components.ComponentRegistrar" />
+167-->[com.google.mlkit:face-mesh-detection:16.0.0-beta2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/fdd4350950800f69ff4e70c5b760b5af/transformed/face-mesh-detection-16.0.0-beta2/AndroidManifest.xml:13:17-82
+168            <meta-data
+168-->[com.google.mlkit:image-labeling:17.0.9] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/2c30a13b83384661710e2c61e060421f/transformed/image-labeling-17.0.9/AndroidManifest.xml:11:13-13:85
+169                android:name="com.google.firebase.components:com.google.mlkit.vision.label.defaults.internal.BundledLabelRegistrar"
+169-->[com.google.mlkit:image-labeling:17.0.9] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/2c30a13b83384661710e2c61e060421f/transformed/image-labeling-17.0.9/AndroidManifest.xml:12:17-132
+170                android:value="com.google.firebase.components.ComponentRegistrar" />
+170-->[com.google.mlkit:image-labeling:17.0.9] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/2c30a13b83384661710e2c61e060421f/transformed/image-labeling-17.0.9/AndroidManifest.xml:13:17-82
+171            <meta-data
+171-->[com.google.mlkit:image-labeling-custom:17.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/72739be1c74b170366e3c41447387d6c/transformed/image-labeling-custom-17.0.3/AndroidManifest.xml:11:13-13:85
+172                android:name="com.google.firebase.components:com.google.mlkit.vision.label.custom.internal.CustomLabelRegistrar"
+172-->[com.google.mlkit:image-labeling-custom:17.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/72739be1c74b170366e3c41447387d6c/transformed/image-labeling-custom-17.0.3/AndroidManifest.xml:12:17-129
+173                android:value="com.google.firebase.components.ComponentRegistrar" />
+173-->[com.google.mlkit:image-labeling-custom:17.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/72739be1c74b170366e3c41447387d6c/transformed/image-labeling-custom-17.0.3/AndroidManifest.xml:13:17-82
+174            <meta-data
+174-->[com.google.mlkit:object-detection:17.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/e6636d76347c36262a55ec14e05e2070/transformed/object-detection-17.0.2/AndroidManifest.xml:14:13-16:85
+175                android:name="com.google.firebase.components:com.google.mlkit.vision.objects.defaults.internal.DefaultObjectsRegistrar"
+175-->[com.google.mlkit:object-detection:17.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/e6636d76347c36262a55ec14e05e2070/transformed/object-detection-17.0.2/AndroidManifest.xml:15:17-136
+176                android:value="com.google.firebase.components.ComponentRegistrar" />
+176-->[com.google.mlkit:object-detection:17.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/e6636d76347c36262a55ec14e05e2070/transformed/object-detection-17.0.2/AndroidManifest.xml:16:17-82
+177            <meta-data
+177-->[com.google.mlkit:object-detection-custom:17.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/4b6d529f6ecd3489992ff2222442054e/transformed/object-detection-custom-17.0.2/AndroidManifest.xml:11:13-13:85
+178                android:name="com.google.firebase.components:com.google.mlkit.vision.objects.custom.internal.CustomObjectsRegistrar"
+178-->[com.google.mlkit:object-detection-custom:17.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/4b6d529f6ecd3489992ff2222442054e/transformed/object-detection-custom-17.0.2/AndroidManifest.xml:12:17-133
+179                android:value="com.google.firebase.components.ComponentRegistrar" />
+179-->[com.google.mlkit:object-detection-custom:17.0.2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/4b6d529f6ecd3489992ff2222442054e/transformed/object-detection-custom-17.0.2/AndroidManifest.xml:13:17-82
+180            <meta-data
+180-->[com.google.mlkit:segmentation-selfie:16.0.0-beta6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/34949fbfe274896ce90e8048092ea3ed/transformed/segmentation-selfie-16.0.0-beta6/AndroidManifest.xml:12:13-14:85
+181                android:name="com.google.firebase.components:com.google.mlkit.vision.segmentation.internal.SegmentationRegistrar"
+181-->[com.google.mlkit:segmentation-selfie:16.0.0-beta6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/34949fbfe274896ce90e8048092ea3ed/transformed/segmentation-selfie-16.0.0-beta6/AndroidManifest.xml:13:17-130
+182                android:value="com.google.firebase.components.ComponentRegistrar" />
+182-->[com.google.mlkit:segmentation-selfie:16.0.0-beta6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/34949fbfe274896ce90e8048092ea3ed/transformed/segmentation-selfie-16.0.0-beta6/AndroidManifest.xml:14:17-82
+183            <meta-data
+183-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/64bb82374385802ce3c6b6940f266b93/transformed/play-services-mlkit-barcode-scanning-18.3.1/AndroidManifest.xml:12:13-14:85
+184                android:name="com.google.firebase.components:com.google.mlkit.vision.barcode.internal.BarcodeRegistrar"
+184-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/64bb82374385802ce3c6b6940f266b93/transformed/play-services-mlkit-barcode-scanning-18.3.1/AndroidManifest.xml:13:17-120
+185                android:value="com.google.firebase.components.ComponentRegistrar" />
+185-->[com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/64bb82374385802ce3c6b6940f266b93/transformed/play-services-mlkit-barcode-scanning-18.3.1/AndroidManifest.xml:14:17-82
+186            <meta-data
+186-->[com.google.android.gms:play-services-mlkit-face-detection:17.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/d81a6ad3294b20785c4799b7aab922d9/transformed/play-services-mlkit-face-detection-17.1.0/AndroidManifest.xml:12:13-14:85
+187                android:name="com.google.firebase.components:com.google.mlkit.vision.face.internal.FaceRegistrar"
+187-->[com.google.android.gms:play-services-mlkit-face-detection:17.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/d81a6ad3294b20785c4799b7aab922d9/transformed/play-services-mlkit-face-detection-17.1.0/AndroidManifest.xml:13:17-114
+188                android:value="com.google.firebase.components.ComponentRegistrar" />
+188-->[com.google.android.gms:play-services-mlkit-face-detection:17.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/d81a6ad3294b20785c4799b7aab922d9/transformed/play-services-mlkit-face-detection-17.1.0/AndroidManifest.xml:14:17-82
+189            <meta-data
+189-->[com.google.mlkit:vision-internal-vkp:18.2.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/72fd87028ad23e310f810ef349fa7fee/transformed/vision-internal-vkp-18.2.3/AndroidManifest.xml:14:13-16:85
+190                android:name="com.google.firebase.components:com.google.mlkit.vision.vkp.VkpRegistrar"
+190-->[com.google.mlkit:vision-internal-vkp:18.2.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/72fd87028ad23e310f810ef349fa7fee/transformed/vision-internal-vkp-18.2.3/AndroidManifest.xml:15:17-103
+191                android:value="com.google.firebase.components.ComponentRegistrar" />
+191-->[com.google.mlkit:vision-internal-vkp:18.2.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/72fd87028ad23e310f810ef349fa7fee/transformed/vision-internal-vkp-18.2.3/AndroidManifest.xml:16:17-82
+192            <meta-data
+192-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:29:13-31:85
+193                android:name="com.google.firebase.components:com.google.mlkit.vision.pose.internal.PoseRegistrar"
+193-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:30:17-114
+194                android:value="com.google.firebase.components.ComponentRegistrar" />
+194-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:31:17-82
+195            <meta-data
+195-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/96ff389e20ace81aa63181350640193a/transformed/play-services-mlkit-text-recognition-common-19.1.0/AndroidManifest.xml:12:13-14:85
+196                android:name="com.google.firebase.components:com.google.mlkit.vision.text.internal.TextRegistrar"
+196-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/96ff389e20ace81aa63181350640193a/transformed/play-services-mlkit-text-recognition-common-19.1.0/AndroidManifest.xml:13:17-114
+197                android:value="com.google.firebase.components.ComponentRegistrar" />
+197-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/96ff389e20ace81aa63181350640193a/transformed/play-services-mlkit-text-recognition-common-19.1.0/AndroidManifest.xml:14:17-82
+198            <meta-data
+198-->[com.google.mlkit:vision-common:17.3.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/a3951d8f53241dca8edb852b7f830731/transformed/vision-common-17.3.0/AndroidManifest.xml:12:13-14:85
+199                android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar"
+199-->[com.google.mlkit:vision-common:17.3.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/a3951d8f53241dca8edb852b7f830731/transformed/vision-common-17.3.0/AndroidManifest.xml:13:17-124
+200                android:value="com.google.firebase.components.ComponentRegistrar" />
+200-->[com.google.mlkit:vision-common:17.3.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/a3951d8f53241dca8edb852b7f830731/transformed/vision-common-17.3.0/AndroidManifest.xml:14:17-82
+201            <meta-data
+201-->[com.google.mlkit:digital-ink-recognition:18.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/8edbb1845dcb124f1a97cd9eaccf57e8/transformed/digital-ink-recognition-18.1.0/AndroidManifest.xml:15:13-17:85
+202                android:name="com.google.firebase.components:com.google.mlkit.vision.digitalink.internal.DigitalInkRecognitionRegistrar"
+202-->[com.google.mlkit:digital-ink-recognition:18.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/8edbb1845dcb124f1a97cd9eaccf57e8/transformed/digital-ink-recognition-18.1.0/AndroidManifest.xml:16:17-137
+203                android:value="com.google.firebase.components.ComponentRegistrar" />
+203-->[com.google.mlkit:digital-ink-recognition:18.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/8edbb1845dcb124f1a97cd9eaccf57e8/transformed/digital-ink-recognition-18.1.0/AndroidManifest.xml:17:17-82
+204            <meta-data
+204-->[com.google.mlkit:entity-extraction:16.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/af3ce69b878f0c566ca2e924e504cc12/transformed/entity-extraction-16.0.0-beta5/AndroidManifest.xml:14:13-16:85
+205                android:name="com.google.firebase.components:com.google.mlkit.nl.entityextraction.internal.EntityExtractionComponentRegistrar"
+205-->[com.google.mlkit:entity-extraction:16.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/af3ce69b878f0c566ca2e924e504cc12/transformed/entity-extraction-16.0.0-beta5/AndroidManifest.xml:15:17-143
+206                android:value="com.google.firebase.components.ComponentRegistrar" />
+206-->[com.google.mlkit:entity-extraction:16.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/af3ce69b878f0c566ca2e924e504cc12/transformed/entity-extraction-16.0.0-beta5/AndroidManifest.xml:16:17-82
+207            <meta-data
+207-->[com.google.mlkit:smart-reply:17.0.4] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f59a0c5c7f9dadec9cbf17f3c6297e2e/transformed/smart-reply-17.0.4/AndroidManifest.xml:26:13-28:85
+208                android:name="com.google.firebase.components:com.google.mlkit.nl.smartreply.bundled.internal.ThickSmartReplyRegistrar"
+208-->[com.google.mlkit:smart-reply:17.0.4] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f59a0c5c7f9dadec9cbf17f3c6297e2e/transformed/smart-reply-17.0.4/AndroidManifest.xml:27:17-135
+209                android:value="com.google.firebase.components.ComponentRegistrar" />
+209-->[com.google.mlkit:smart-reply:17.0.4] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f59a0c5c7f9dadec9cbf17f3c6297e2e/transformed/smart-reply-17.0.4/AndroidManifest.xml:28:17-82
+210            <meta-data
+210-->[com.google.mlkit:language-id:17.0.6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/40988646df4ecdbd6db8c82b4d1f2693/transformed/language-id-17.0.6/AndroidManifest.xml:11:13-13:85
+211                android:name="com.google.firebase.components:com.google.mlkit.nl.languageid.bundled.internal.ThickLanguageIdRegistrar"
+211-->[com.google.mlkit:language-id:17.0.6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/40988646df4ecdbd6db8c82b4d1f2693/transformed/language-id-17.0.6/AndroidManifest.xml:12:17-135
+212                android:value="com.google.firebase.components.ComponentRegistrar" />
+212-->[com.google.mlkit:language-id:17.0.6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/40988646df4ecdbd6db8c82b4d1f2693/transformed/language-id-17.0.6/AndroidManifest.xml:13:17-82
+213            <meta-data
+213-->[com.google.mlkit:translate:17.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/e0b196e3c8935f0a81f8111dce02b8b1/transformed/translate-17.0.3/AndroidManifest.xml:14:13-16:85
+214                android:name="com.google.firebase.components:com.google.mlkit.nl.translate.NaturalLanguageTranslateRegistrar"
+214-->[com.google.mlkit:translate:17.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/e0b196e3c8935f0a81f8111dce02b8b1/transformed/translate-17.0.3/AndroidManifest.xml:15:17-126
+215                android:value="com.google.firebase.components.ComponentRegistrar" />
+215-->[com.google.mlkit:translate:17.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/e0b196e3c8935f0a81f8111dce02b8b1/transformed/translate-17.0.3/AndroidManifest.xml:16:17-82
+216            <meta-data
+216-->[com.google.mlkit:smart-reply-common:16.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/5e09438d5a3497e5c4f329ea5202c758/transformed/smart-reply-common-16.1.0/AndroidManifest.xml:26:13-28:85
+217                android:name="com.google.firebase.components:com.google.mlkit.nl.smartreply.internal.SmartReplyRegistrar"
+217-->[com.google.mlkit:smart-reply-common:16.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/5e09438d5a3497e5c4f329ea5202c758/transformed/smart-reply-common-16.1.0/AndroidManifest.xml:27:17-122
+218                android:value="com.google.firebase.components.ComponentRegistrar" />
+218-->[com.google.mlkit:smart-reply-common:16.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/5e09438d5a3497e5c4f329ea5202c758/transformed/smart-reply-common-16.1.0/AndroidManifest.xml:28:17-82
+219            <meta-data
+219-->[com.google.mlkit:language-id-common:16.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/5bf7e117bf6a325eca1b8d3bffb7a241/transformed/language-id-common-16.1.0/AndroidManifest.xml:26:13-28:85
+220                android:name="com.google.firebase.components:com.google.mlkit.nl.languageid.internal.LanguageIdRegistrar"
+220-->[com.google.mlkit:language-id-common:16.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/5bf7e117bf6a325eca1b8d3bffb7a241/transformed/language-id-common-16.1.0/AndroidManifest.xml:27:17-122
+221                android:value="com.google.firebase.components.ComponentRegistrar" />
+221-->[com.google.mlkit:language-id-common:16.1.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/5bf7e117bf6a325eca1b8d3bffb7a241/transformed/language-id-common-16.1.0/AndroidManifest.xml:28:17-82
+222            <meta-data
+222-->[com.google.mlkit:common:18.11.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/1592ad6f4326895494238c1060d5f8bb/transformed/common-18.11.0/AndroidManifest.xml:20:13-22:85
+223                android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar"
+223-->[com.google.mlkit:common:18.11.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/1592ad6f4326895494238c1060d5f8bb/transformed/common-18.11.0/AndroidManifest.xml:21:17-120
+224                android:value="com.google.firebase.components.ComponentRegistrar" />
+224-->[com.google.mlkit:common:18.11.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/1592ad6f4326895494238c1060d5f8bb/transformed/common-18.11.0/AndroidManifest.xml:22:17-82
+225        </service>
+226
+227        <receiver
+227-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:37:9-44:20
+228            android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
+228-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:38:13-78
+229            android:exported="true"
+229-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:39:13-36
+230            android:permission="com.google.android.c2dm.permission.SEND" >
+230-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:40:13-73
+231            <intent-filter>
+231-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:41:13-43:29
+232                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+232-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:42:17-81
+232-->[com.google.firebase:firebase-iid:20.1.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f4672efcda4db3d1099d0daa9f2eb84d/transformed/firebase-iid-20.1.5/AndroidManifest.xml:42:25-78
+233            </intent-filter>
+234        </receiver>
+235
+236        <provider
+236-->[com.google.firebase:firebase-common:22.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec033c6bc0259cf346b94f3841183d46/transformed/firebase-common-22.0.1/AndroidManifest.xml:23:9-28:39
+237            android:name="com.google.firebase.provider.FirebaseInitProvider"
+237-->[com.google.firebase:firebase-common:22.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec033c6bc0259cf346b94f3841183d46/transformed/firebase-common-22.0.1/AndroidManifest.xml:24:13-77
+238            android:authorities="com.example.nutrimate_app.firebaseinitprovider"
+238-->[com.google.firebase:firebase-common:22.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec033c6bc0259cf346b94f3841183d46/transformed/firebase-common-22.0.1/AndroidManifest.xml:25:13-72
+239            android:directBootAware="true"
+239-->[com.google.firebase:firebase-common:22.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec033c6bc0259cf346b94f3841183d46/transformed/firebase-common-22.0.1/AndroidManifest.xml:26:13-43
+240            android:exported="false"
+240-->[com.google.firebase:firebase-common:22.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec033c6bc0259cf346b94f3841183d46/transformed/firebase-common-22.0.1/AndroidManifest.xml:27:13-37
+241            android:initOrder="100" />
+241-->[com.google.firebase:firebase-common:22.0.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec033c6bc0259cf346b94f3841183d46/transformed/firebase-common-22.0.1/AndroidManifest.xml:28:13-36
+242        <!--
+243             Required for ML Kit Pose Detection GPU acceleration. Applications that target Android
+244             S+ require explicit declaration of any referenced vendor-provided libraries.
+245        -->
+246        <uses-native-library
+246-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:16:9-18:40
+247            android:name="libOpenCL.so"
+247-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:17:13-40
+248            android:required="false" />
+248-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:18:13-37
+249        <uses-native-library
+249-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:16:9-18:40
+250            android:name="libOpenCL-car.so"
+250-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:17:13-40
+251            android:required="false" />
+251-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:18:13-37
+252        <uses-native-library
+252-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:16:9-18:40
+253            android:name="libOpenCL-pixel.so"
+253-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:17:13-40
+254            android:required="false" />
+254-->[com.google.mlkit:pose-detection-common:18.0.0-beta5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/9f8246e496d70d4a02e19abbf8896f4e/transformed/pose-detection-common-18.0.0-beta5/AndroidManifest.xml:18:13-37
+255
+256        <provider
+256-->[com.google.mlkit:common:18.11.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/1592ad6f4326895494238c1060d5f8bb/transformed/common-18.11.0/AndroidManifest.xml:9:9-13:38
+257            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
+257-->[com.google.mlkit:common:18.11.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/1592ad6f4326895494238c1060d5f8bb/transformed/common-18.11.0/AndroidManifest.xml:10:13-78
+258            android:authorities="com.example.nutrimate_app.mlkitinitprovider"
+258-->[com.google.mlkit:common:18.11.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/1592ad6f4326895494238c1060d5f8bb/transformed/common-18.11.0/AndroidManifest.xml:11:13-69
+259            android:exported="false"
+259-->[com.google.mlkit:common:18.11.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/1592ad6f4326895494238c1060d5f8bb/transformed/common-18.11.0/AndroidManifest.xml:12:13-37
+260            android:initOrder="99" />
+260-->[com.google.mlkit:common:18.11.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/1592ad6f4326895494238c1060d5f8bb/transformed/common-18.11.0/AndroidManifest.xml:13:13-35
+261
+262        <service
+262-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:24:9-32:19
+263            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
+263-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:25:13-94
+264            android:enabled="true"
+264-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:26:13-35
+265            android:exported="false" >
+265-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:27:13-37
+266            <meta-data
+266-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:29:13-31:104
+267                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
+267-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:30:17-76
+268                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
+268-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:31:17-101
+269        </service>
+270
+271        <activity
+271-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:34:9-41:20
+272            android:name="androidx.credentials.playservices.HiddenActivity"
+272-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:35:13-76
+273            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+273-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:36:13-87
+274            android:enabled="true"
+274-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:37:13-35
+275            android:exported="false"
+275-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:38:13-37
+276            android:fitsSystemWindows="true"
+276-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:39:13-45
+277            android:theme="@style/Theme.Hidden" >
+277-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ed9b0c4bfead2f8d06fd59a8f1f4c301/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:40:13-48
+278        </activity>
+279        <activity
+279-->[com.google.android.gms:play-services-auth:20.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/09f29ecf6889849ac591e74acd79fd04/transformed/play-services-auth-20.7.0/AndroidManifest.xml:23:9-27:75
+280            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+280-->[com.google.android.gms:play-services-auth:20.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/09f29ecf6889849ac591e74acd79fd04/transformed/play-services-auth-20.7.0/AndroidManifest.xml:24:13-93
+281            android:excludeFromRecents="true"
+281-->[com.google.android.gms:play-services-auth:20.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/09f29ecf6889849ac591e74acd79fd04/transformed/play-services-auth-20.7.0/AndroidManifest.xml:25:13-46
+282            android:exported="false"
+282-->[com.google.android.gms:play-services-auth:20.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/09f29ecf6889849ac591e74acd79fd04/transformed/play-services-auth-20.7.0/AndroidManifest.xml:26:13-37
+283            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+283-->[com.google.android.gms:play-services-auth:20.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/09f29ecf6889849ac591e74acd79fd04/transformed/play-services-auth-20.7.0/AndroidManifest.xml:27:13-72
+284        <!--
+285            Service handling Google Sign-In user revocation. For apps that do not integrate with
+286            Google Sign-In, this service will never be started.
+287        -->
+288        <service
+288-->[com.google.android.gms:play-services-auth:20.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/09f29ecf6889849ac591e74acd79fd04/transformed/play-services-auth-20.7.0/AndroidManifest.xml:33:9-37:51
+289            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+289-->[com.google.android.gms:play-services-auth:20.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/09f29ecf6889849ac591e74acd79fd04/transformed/play-services-auth-20.7.0/AndroidManifest.xml:34:13-89
+290            android:exported="true"
+290-->[com.google.android.gms:play-services-auth:20.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/09f29ecf6889849ac591e74acd79fd04/transformed/play-services-auth-20.7.0/AndroidManifest.xml:35:13-36
+291            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+291-->[com.google.android.gms:play-services-auth:20.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/09f29ecf6889849ac591e74acd79fd04/transformed/play-services-auth-20.7.0/AndroidManifest.xml:36:13-107
+292            android:visibleToInstantApps="true" />
+292-->[com.google.android.gms:play-services-auth:20.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/09f29ecf6889849ac591e74acd79fd04/transformed/play-services-auth-20.7.0/AndroidManifest.xml:37:13-48
+293        <service
+293-->[com.google.mlkit:acceleration:16.0.0-beta2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f2c9e89201ee5eb0df5c4b330bbcbab7/transformed/acceleration-16.0.0-beta2/AndroidManifest.xml:8:9-11:68
+294            android:name="com.google.mlkit.acceleration.internal.MlKitRemoteWorkerService"
+294-->[com.google.mlkit:acceleration:16.0.0-beta2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f2c9e89201ee5eb0df5c4b330bbcbab7/transformed/acceleration-16.0.0-beta2/AndroidManifest.xml:9:13-91
+295            android:exported="false"
+295-->[com.google.mlkit:acceleration:16.0.0-beta2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f2c9e89201ee5eb0df5c4b330bbcbab7/transformed/acceleration-16.0.0-beta2/AndroidManifest.xml:10:13-37
+296            android:process=":mlkit_acceleration_mini_benchmark" />
+296-->[com.google.mlkit:acceleration:16.0.0-beta2] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/f2c9e89201ee5eb0df5c4b330bbcbab7/transformed/acceleration-16.0.0-beta2/AndroidManifest.xml:11:13-65
+297
+298        <activity
+298-->[com.google.android.gms:play-services-base:18.5.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/6d0a5527f8d43c7c4e840f383c7d7f17/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:9-173
+299            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+299-->[com.google.android.gms:play-services-base:18.5.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/6d0a5527f8d43c7c4e840f383c7d7f17/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:19-85
+300            android:exported="false"
+300-->[com.google.android.gms:play-services-base:18.5.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/6d0a5527f8d43c7c4e840f383c7d7f17/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:146-170
+301            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+301-->[com.google.android.gms:play-services-base:18.5.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/6d0a5527f8d43c7c4e840f383c7d7f17/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:86-145
+302
+303        <uses-library
+303-->[androidx.window:window:1.2.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/fc929273ee08c62165290f4dace6d352/transformed/window-1.2.0/AndroidManifest.xml:23:9-25:40
+304            android:name="androidx.window.extensions"
+304-->[androidx.window:window:1.2.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/fc929273ee08c62165290f4dace6d352/transformed/window-1.2.0/AndroidManifest.xml:24:13-54
+305            android:required="false" />
+305-->[androidx.window:window:1.2.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/fc929273ee08c62165290f4dace6d352/transformed/window-1.2.0/AndroidManifest.xml:25:13-37
+306        <uses-library
+306-->[androidx.window:window:1.2.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/fc929273ee08c62165290f4dace6d352/transformed/window-1.2.0/AndroidManifest.xml:26:9-28:40
+307            android:name="androidx.window.sidecar"
+307-->[androidx.window:window:1.2.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/fc929273ee08c62165290f4dace6d352/transformed/window-1.2.0/AndroidManifest.xml:27:13-51
+308            android:required="false" />
+308-->[androidx.window:window:1.2.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/fc929273ee08c62165290f4dace6d352/transformed/window-1.2.0/AndroidManifest.xml:28:13-37
+309
+310        <service
+310-->[androidx.work:work-multiprocess:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/43d92f4e602fa4d58f1785d19f1c8006/transformed/work-multiprocess-2.7.0/AndroidManifest.xml:25:9-27:40
+311            android:name="androidx.work.multiprocess.RemoteWorkManagerService"
+311-->[androidx.work:work-multiprocess:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/43d92f4e602fa4d58f1785d19f1c8006/transformed/work-multiprocess-2.7.0/AndroidManifest.xml:26:13-79
+312            android:exported="false" />
+312-->[androidx.work:work-multiprocess:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/43d92f4e602fa4d58f1785d19f1c8006/transformed/work-multiprocess-2.7.0/AndroidManifest.xml:27:13-37
+313
+314        <provider
+314-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:31:9-39:20
+315            android:name="androidx.startup.InitializationProvider"
+315-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:32:13-67
+316            android:authorities="com.example.nutrimate_app.androidx-startup"
+316-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:33:13-68
+317            android:exported="false" >
+317-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:34:13-37
+318            <meta-data
+318-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:36:13-38:52
+319                android:name="androidx.work.WorkManagerInitializer"
+319-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:37:17-68
+320                android:value="androidx.startup" />
+320-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:38:17-49
+321            <meta-data
+321-->[androidx.emoji2:emoji2:1.2.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/b4be4e84b8ae58a8b814cfd8d70ad2f6/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+322                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+322-->[androidx.emoji2:emoji2:1.2.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/b4be4e84b8ae58a8b814cfd8d70ad2f6/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+323                android:value="androidx.startup" />
+323-->[androidx.emoji2:emoji2:1.2.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/b4be4e84b8ae58a8b814cfd8d70ad2f6/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+324            <meta-data
+324-->[androidx.lifecycle:lifecycle-process:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/552dfdddc04fe2bfb55fbd400dfbb15a/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:29:13-31:52
+325                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+325-->[androidx.lifecycle:lifecycle-process:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/552dfdddc04fe2bfb55fbd400dfbb15a/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:30:17-78
+326                android:value="androidx.startup" />
+326-->[androidx.lifecycle:lifecycle-process:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/552dfdddc04fe2bfb55fbd400dfbb15a/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:31:17-49
+327            <meta-data
+327-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+328                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+328-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+329                android:value="androidx.startup" />
+329-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+330        </provider>
+331
+332        <service
+332-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:41:9-46:35
+333            android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"
+333-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:42:13-88
+334            android:directBootAware="false"
+334-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:43:13-44
+335            android:enabled="@bool/enable_system_alarm_service_default"
+335-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:44:13-72
+336            android:exported="false" />
+336-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:45:13-37
+337        <service
+337-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:47:9-53:35
+338            android:name="androidx.work.impl.background.systemjob.SystemJobService"
+338-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:48:13-84
+339            android:directBootAware="false"
+339-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:49:13-44
+340            android:enabled="@bool/enable_system_job_service_default"
+340-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:50:13-70
+341            android:exported="true"
+341-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:51:13-36
+342            android:permission="android.permission.BIND_JOB_SERVICE" />
+342-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:52:13-69
+343        <service
+343-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:54:9-59:35
+344            android:name="androidx.work.impl.foreground.SystemForegroundService"
+344-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:55:13-81
+345            android:directBootAware="false"
+345-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:56:13-44
+346            android:enabled="@bool/enable_system_foreground_service_default"
+346-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:57:13-77
+347            android:exported="false" />
+347-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:58:13-37
+348
+349        <receiver
+349-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:61:9-66:35
+350            android:name="androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver"
+350-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:62:13-88
+351            android:directBootAware="false"
+351-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:63:13-44
+352            android:enabled="true"
+352-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:64:13-35
+353            android:exported="false" />
+353-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:65:13-37
+354        <receiver
+354-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:67:9-77:20
+355            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy"
+355-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:68:13-106
+356            android:directBootAware="false"
+356-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:69:13-44
+357            android:enabled="false"
+357-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:70:13-36
+358            android:exported="false" >
+358-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:71:13-37
+359            <intent-filter>
+359-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:73:13-76:29
+360                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+360-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:74:17-87
+360-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:74:25-84
+361                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+361-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:75:17-90
+361-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:75:25-87
+362            </intent-filter>
+363        </receiver>
+364        <receiver
+364-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:78:9-88:20
+365            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy"
+365-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:79:13-104
+366            android:directBootAware="false"
+366-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:80:13-44
+367            android:enabled="false"
+367-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:81:13-36
+368            android:exported="false" >
+368-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:82:13-37
+369            <intent-filter>
+369-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:84:13-87:29
+370                <action android:name="android.intent.action.BATTERY_OKAY" />
+370-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:85:17-77
+370-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:85:25-74
+371                <action android:name="android.intent.action.BATTERY_LOW" />
+371-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:86:17-76
+371-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:86:25-73
+372            </intent-filter>
+373        </receiver>
+374        <receiver
+374-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:89:9-99:20
+375            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy"
+375-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:90:13-104
+376            android:directBootAware="false"
+376-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:91:13-44
+377            android:enabled="false"
+377-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:92:13-36
+378            android:exported="false" >
+378-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:93:13-37
+379            <intent-filter>
+379-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:95:13-98:29
+380                <action android:name="android.intent.action.DEVICE_STORAGE_LOW" />
+380-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:96:17-83
+380-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:96:25-80
+381                <action android:name="android.intent.action.DEVICE_STORAGE_OK" />
+381-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:97:17-82
+381-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:97:25-79
+382            </intent-filter>
+383        </receiver>
+384        <receiver
+384-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:100:9-109:20
+385            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy"
+385-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:101:13-103
+386            android:directBootAware="false"
+386-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:102:13-44
+387            android:enabled="false"
+387-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:103:13-36
+388            android:exported="false" >
+388-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:104:13-37
+389            <intent-filter>
+389-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:106:13-108:29
+390                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+390-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:107:17-79
+390-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:107:25-76
+391            </intent-filter>
+392        </receiver>
+393        <receiver
+393-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:110:9-121:20
+394            android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver"
+394-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:111:13-88
+395            android:directBootAware="false"
+395-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:112:13-44
+396            android:enabled="false"
+396-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:113:13-36
+397            android:exported="false" >
+397-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:114:13-37
+398            <intent-filter>
+398-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:116:13-120:29
+399                <action android:name="android.intent.action.BOOT_COMPLETED" />
+399-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:117:17-79
+399-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:117:25-76
+400                <action android:name="android.intent.action.TIME_SET" />
+400-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:118:17-73
+400-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:118:25-70
+401                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+401-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:119:17-81
+401-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:119:25-78
+402            </intent-filter>
+403        </receiver>
+404        <receiver
+404-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:122:9-131:20
+405            android:name="androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver"
+405-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:123:13-99
+406            android:directBootAware="false"
+406-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:124:13-44
+407            android:enabled="@bool/enable_system_alarm_service_default"
+407-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:125:13-72
+408            android:exported="false" >
+408-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:126:13-37
+409            <intent-filter>
+409-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:128:13-130:29
+410                <action android:name="androidx.work.impl.background.systemalarm.UpdateProxies" />
+410-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:129:17-98
+410-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:129:25-95
+411            </intent-filter>
+412        </receiver>
+413        <receiver
+413-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:132:9-142:20
+414            android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+414-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:133:13-78
+415            android:directBootAware="false"
+415-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:134:13-44
+416            android:enabled="true"
+416-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:135:13-35
+417            android:exported="true"
+417-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:136:13-36
+418            android:permission="android.permission.DUMP" >
+418-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:137:13-57
+419            <intent-filter>
+419-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:139:13-141:29
+420                <action android:name="androidx.work.diagnostics.REQUEST_DIAGNOSTICS" />
+420-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:140:17-88
+420-->[androidx.work:work-runtime:2.7.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/22f23c0b0972b6a023ad67072154b656/transformed/work-runtime-2.7.0/AndroidManifest.xml:140:25-85
+421            </intent-filter>
+422        </receiver>
+423
+424        <meta-data
+424-->[com.google.android.gms:play-services-basement:18.8.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/e1072639fbf4e4bc1690920a288423fb/transformed/play-services-basement-18.8.0/AndroidManifest.xml:21:9-23:69
+425            android:name="com.google.android.gms.version"
+425-->[com.google.android.gms:play-services-basement:18.8.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/e1072639fbf4e4bc1690920a288423fb/transformed/play-services-basement-18.8.0/AndroidManifest.xml:22:13-58
+426            android:value="@integer/google_play_services_version" />
+426-->[com.google.android.gms:play-services-basement:18.8.0] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/e1072639fbf4e4bc1690920a288423fb/transformed/play-services-basement-18.8.0/AndroidManifest.xml:23:13-66
+427
+428        <receiver
+428-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+429            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+429-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+430            android:directBootAware="false"
+430-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+431            android:enabled="true"
+431-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+432            android:exported="true"
+432-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+433            android:permission="android.permission.DUMP" >
+433-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+434            <intent-filter>
+434-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+435                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+435-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+435-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+436            </intent-filter>
+437            <intent-filter>
+437-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+438                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+438-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+438-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+439            </intent-filter>
+440            <intent-filter>
+440-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+441                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+441-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+441-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+442            </intent-filter>
+443            <intent-filter>
+443-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+444                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+444-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+444-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/cc7090163819e742639ff9a4197c19d1/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+445            </intent-filter>
+446        </receiver>
+447
+448        <service
+448-->[com.google.android.datatransport:transport-backend-cct:2.3.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/a4f0bcb4769573ca6e9183ccfcd32dc6/transformed/transport-backend-cct-2.3.3/AndroidManifest.xml:29:9-35:19
+449            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+449-->[com.google.android.datatransport:transport-backend-cct:2.3.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/a4f0bcb4769573ca6e9183ccfcd32dc6/transformed/transport-backend-cct-2.3.3/AndroidManifest.xml:30:13-103
+450            android:exported="false" >
+450-->[com.google.android.datatransport:transport-backend-cct:2.3.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/a4f0bcb4769573ca6e9183ccfcd32dc6/transformed/transport-backend-cct-2.3.3/AndroidManifest.xml:31:13-37
+451            <meta-data
+451-->[com.google.android.datatransport:transport-backend-cct:2.3.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/a4f0bcb4769573ca6e9183ccfcd32dc6/transformed/transport-backend-cct-2.3.3/AndroidManifest.xml:32:13-34:39
+452                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+452-->[com.google.android.datatransport:transport-backend-cct:2.3.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/a4f0bcb4769573ca6e9183ccfcd32dc6/transformed/transport-backend-cct-2.3.3/AndroidManifest.xml:33:17-94
+453                android:value="cct" />
+453-->[com.google.android.datatransport:transport-backend-cct:2.3.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/a4f0bcb4769573ca6e9183ccfcd32dc6/transformed/transport-backend-cct-2.3.3/AndroidManifest.xml:34:17-36
+454        </service>
+455        <service
+455-->[com.google.android.datatransport:transport-runtime:2.2.6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec3b8d1d825f891415456105739c4928/transformed/transport-runtime-2.2.6/AndroidManifest.xml:26:9-30:19
+456            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+456-->[com.google.android.datatransport:transport-runtime:2.2.6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec3b8d1d825f891415456105739c4928/transformed/transport-runtime-2.2.6/AndroidManifest.xml:27:13-117
+457            android:exported="false"
+457-->[com.google.android.datatransport:transport-runtime:2.2.6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec3b8d1d825f891415456105739c4928/transformed/transport-runtime-2.2.6/AndroidManifest.xml:28:13-37
+458            android:permission="android.permission.BIND_JOB_SERVICE" >
+458-->[com.google.android.datatransport:transport-runtime:2.2.6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec3b8d1d825f891415456105739c4928/transformed/transport-runtime-2.2.6/AndroidManifest.xml:29:13-69
+459        </service>
+460
+461        <receiver
+461-->[com.google.android.datatransport:transport-runtime:2.2.6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec3b8d1d825f891415456105739c4928/transformed/transport-runtime-2.2.6/AndroidManifest.xml:32:9-34:40
+462            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+462-->[com.google.android.datatransport:transport-runtime:2.2.6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec3b8d1d825f891415456105739c4928/transformed/transport-runtime-2.2.6/AndroidManifest.xml:33:13-132
+463            android:exported="false" />
+463-->[com.google.android.datatransport:transport-runtime:2.2.6] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/ec3b8d1d825f891415456105739c4928/transformed/transport-runtime-2.2.6/AndroidManifest.xml:34:13-37
+464
+465        <service
+465-->[androidx.room:room-runtime:2.2.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/3705d6a6378e8deaad32a50add9b21a0/transformed/room-runtime-2.2.5/AndroidManifest.xml:25:9-28:40
+466            android:name="androidx.room.MultiInstanceInvalidationService"
+466-->[androidx.room:room-runtime:2.2.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/3705d6a6378e8deaad32a50add9b21a0/transformed/room-runtime-2.2.5/AndroidManifest.xml:26:13-74
+467            android:directBootAware="true"
+467-->[androidx.room:room-runtime:2.2.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/3705d6a6378e8deaad32a50add9b21a0/transformed/room-runtime-2.2.5/AndroidManifest.xml:27:13-43
+468            android:exported="false" /> <!-- The activities will be merged into the manifest of the hosting app. -->
+468-->[androidx.room:room-runtime:2.2.5] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/3705d6a6378e8deaad32a50add9b21a0/transformed/room-runtime-2.2.5/AndroidManifest.xml:28:13-37
+469        <activity
+469-->[com.google.android.play:core-common:2.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/38b722a0edba327600ba2fc28df48e5f/transformed/core-common-2.0.3/AndroidManifest.xml:14:9-18:65
+470            android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
+470-->[com.google.android.play:core-common:2.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/38b722a0edba327600ba2fc28df48e5f/transformed/core-common-2.0.3/AndroidManifest.xml:15:13-93
+471            android:exported="false"
+471-->[com.google.android.play:core-common:2.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/38b722a0edba327600ba2fc28df48e5f/transformed/core-common-2.0.3/AndroidManifest.xml:16:13-37
+472            android:stateNotNeeded="true"
+472-->[com.google.android.play:core-common:2.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/38b722a0edba327600ba2fc28df48e5f/transformed/core-common-2.0.3/AndroidManifest.xml:17:13-42
+473            android:theme="@style/Theme.PlayCore.Transparent" />
+473-->[com.google.android.play:core-common:2.0.3] /home/priyanshu-pareek/.gradle/caches/8.13/transforms/38b722a0edba327600ba2fc28df48e5f/transformed/core-common-2.0.3/AndroidManifest.xml:18:13-62
+474    </application>
+475
+476</manifest>
