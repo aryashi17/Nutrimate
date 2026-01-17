@@ -44,7 +44,7 @@ bool w2Completed = false;
       },
       {
         'w1': 'CALORIES', 'w2': 'FIBER', 
-        'r1': 4, 'c1': 0, 'r2': 2, 'c2': 4, // Join at 'R'
+        'r1': 4, 'c1': 0, 'r2': 0, 'c2': 4, // Join at 'R'
         'clue1': 'Units of energy in food', 
         'clue2': 'Aids digestion'
       },
